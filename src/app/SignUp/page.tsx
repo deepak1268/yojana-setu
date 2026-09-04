@@ -87,7 +87,7 @@ export default function SignUp() {
             </div>
 
             <div className="mt-8 border-t border-foreground/10 pt-6 text-center">
-              <p className="text-sm text-muted">Already have an account? <a href="/Login" className="font-bold text-foreground underline decoration-saffron decoration-2 underline-offset-4">Login</a></p>
+              <p className="text-sm text-muted">Already have an account? <a href="/login" className="font-bold text-foreground underline decoration-saffron decoration-2 underline-offset-4">Login</a></p>
             </div>
             <div className="mt-6 text-center">
               <a href="/" className="text-sm font-medium text-muted transition hover:text-foreground">← Back to home</a>

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function Cta() {
   return (
     <section className="mx-auto max-w-6xl px-5 py-16 sm:px-6">
@@ -12,12 +14,12 @@ export function Cta() {
             clear next steps.
           </p>
         </div>
-        <a
-          href="#matcher"
+        <Link
+          href="/login"
           className="shrink-0 rounded-full bg-saffron px-6 py-3 text-sm font-semibold text-white hover:bg-saffron-deep"
         >
           Find my scheme
-        </a>
+        </Link>
       </div>
     </section>
   );

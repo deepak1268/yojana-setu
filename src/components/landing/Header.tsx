@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-navy/10 bg-cream/85 backdrop-blur-md">
@@ -42,12 +44,12 @@ export function Header() {
           </a>
         </nav>
 
-        <a
-          href="#matcher"
+        <Link
+          href="/login"
           className="rounded-full bg-navy px-4 py-2 text-sm font-semibold text-cream shadow-sm transition hover:bg-ink"
         >
           Find my scheme
-        </a>
+        </Link>
       </div>
       <nav className="flex gap-5 overflow-x-auto border-t border-navy/5 px-5 py-2.5 text-xs font-medium text-ink/75 md:hidden">
         <a href="#features">Features</a>

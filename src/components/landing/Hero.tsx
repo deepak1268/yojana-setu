@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { SchemeMatcher } from "./SchemeMatcher";
 
 export function Hero() {
@@ -21,12 +22,12 @@ export function Hero() {
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <a
-              href="#matcher"
+            <Link
+              href="/login"
               className="rounded-full bg-saffron px-5 py-3 text-sm font-semibold text-white shadow-md shadow-saffron/25 transition hover:bg-saffron-deep"
             >
               Match a scheme
-            </a>
+            </Link>
             <a
               href="#features"
               className="rounded-full border border-navy/15 bg-card px-5 py-3 text-sm font-semibold text-ink hover:border-navy/30"

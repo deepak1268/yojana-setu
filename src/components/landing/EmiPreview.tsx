@@ -48,7 +48,7 @@ export function EmiPreview() {
   }, [amount, scheme]);
 
   return (
-    <section id="calculator" className="scroll-mt-[18vh] border-y border-navy/8 bg-navy text-cream">
+    <section id="calculator" className="scroll-mt-[25vh] border-y border-navy/8 bg-navy text-cream">
       <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 sm:px-6 lg:grid-cols-2 lg:py-20">
         <div>
           <p className="text-xs font-semibold tracking-[0.2em] text-saffron uppercase">

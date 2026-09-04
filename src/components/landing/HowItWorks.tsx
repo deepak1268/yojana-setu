@@ -25,7 +25,7 @@ export function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="scroll-mt-[18vh] border-y border-navy/8 bg-card/70"
+      className="scroll-mt-[25vh] border-y border-navy/8 bg-card/70"
     >
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:py-20">
         <h2 className="font-display text-3xl text-ink sm:text-4xl">
