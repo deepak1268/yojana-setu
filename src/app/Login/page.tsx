@@ -47,8 +47,7 @@ export default function Login() {
               <div>
                 <label htmlFor="email" className="mb-2 block text-sm font-semibold">Email address</label>
                 <div className="relative">
-                  <span aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-base font-bold text-saffron">@</span>
-                  <input id="email" name="email" type="email" placeholder="you@example.com" required className="w-full rounded-xl border border-foreground/15 bg-background py-3.5 pl-11 pr-4 text-sm outline-none transition placeholder:text-muted/60 focus:border-saffron focus:ring-4 focus:ring-saffron/10" />
+                  <input id="email" name="email" type="email" placeholder="you@example.com" required className="w-full rounded-xl border border-foreground/15 bg-background py-3.5 px-4 text-sm outline-none transition placeholder:text-muted/60 focus:border-saffron focus:ring-4 focus:ring-saffron/10" />
                 </div>
               </div>
 
@@ -58,8 +57,7 @@ export default function Login() {
                   <a href="#" className="text-xs font-semibold text-saffron transition hover:text-saffron-deep">Forgot password?</a>
                 </div>
                 <div className="relative">
-                  <span aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-base text-green">▣</span>
-                  <input id="password" name="password" type="password" placeholder="Enter your password" required className="w-full rounded-xl border border-foreground/15 bg-background py-3.5 pl-11 pr-4 text-sm outline-none transition placeholder:text-muted/60 focus:border-green focus:ring-4 focus:ring-green/10" />
+                  <input id="password" name="password" type="password" placeholder="Enter your password" required className="w-full rounded-xl border border-foreground/15 bg-background py-3.5 px-4 text-sm outline-none transition placeholder:text-muted/60 focus:border-green focus:ring-4 focus:ring-green/10" />
                 </div>
               </div>
 
