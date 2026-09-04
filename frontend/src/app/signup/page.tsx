@@ -1,4 +1,4 @@
-export default function SignUp() {
+export default function signup() {
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-5 py-8 text-foreground sm:px-8">
       <div className="pointer-events-none absolute -left-24 top-12 h-64 w-64 rounded-full bg-saffron/10 blur-3xl" />
@@ -47,16 +47,14 @@ export default function SignUp() {
               <div>
                 <label htmlFor="name" className="mb-2 block text-sm font-semibold">Full name</label>
                 <div className="relative">
-                  <span aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-base font-bold text-saffron">✦</span>
-                  <input id="name" name="name" type="text" placeholder="Enter your full name" required className="w-full rounded-xl border border-foreground/15 bg-background py-3.5 pl-11 pr-4 text-sm outline-none transition placeholder:text-muted/60 focus:border-saffron focus:ring-4 focus:ring-saffron/10" />
+                  <input id="name" name="name" type="text" placeholder="Enter your full name" required className="w-full rounded-xl border border-foreground/15 bg-background py-3.5 px-4 text-sm outline-none transition placeholder:text-muted/60 focus:border-saffron focus:ring-4 focus:ring-saffron/10" />
                 </div>
               </div>
 
               <div>
                 <label htmlFor="email" className="mb-2 block text-sm font-semibold">Email address</label>
                 <div className="relative">
-                  <span aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-base font-bold text-saffron">@</span>
-                  <input id="email" name="email" type="email" placeholder="you@example.com" required className="w-full rounded-xl border border-foreground/15 bg-background py-3.5 pl-11 pr-4 text-sm outline-none transition placeholder:text-muted/60 focus:border-saffron focus:ring-4 focus:ring-saffron/10" />
+                  <input id="email" name="email" type="email" placeholder="you@example.com" required className="w-full rounded-xl border border-foreground/15 bg-background py-3.5 px-4 text-sm outline-none transition placeholder:text-muted/60 focus:border-saffron focus:ring-4 focus:ring-saffron/10" />
                 </div>
               </div>
 
