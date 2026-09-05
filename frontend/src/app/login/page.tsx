@@ -3,10 +3,80 @@
 import { useTransition } from "react";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
+import Script from "next/script";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
+
+declare global {
+  interface Window {
+    google: {
+      accounts: {
+        id: {
+          initialize: (config: {
+            client_id: string;
+            callback: (response: { credential: string }) => void;
+          }) => void;
+
+          renderButton: (
+            parent: HTMLElement,
+            options: {
+              theme?: string;
+              size?: string;
+              width?: number;
+            }
+          ) => void;
+        };
+      };
+    };
+  }
+}
+
 export default function login() {
   const [isPending, startTransition] = useTransition();
   const { setUser, loading, setLoading } = useAuth();
+  const googleButtonRef = useRef<HTMLDivElement>(null);
+  console.log(
+  "Google Client ID:",
+  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
+);
+  
+  const handleGoogleResponse = async (response: { credential: string }) => {
+    setLoading(true);
+
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/auth/google",
+        {
+          credential: response.credential,
+        }
+      );
+
+      const { token, user } = res.data;
+
+      localStorage.setItem("token", token);
+
+      setUser(user);
+
+      toast.success("Welcome! You're signed in successfully.!");
+
+      console.log("Google signup successful:", user);
+
+      // Redirect later
+      // window.location.href = "/dashboard";
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error(
+          error.response?.data?.message ||
+          "Google authentication failed. Please try again."
+        );
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -58,6 +128,27 @@ export default function login() {
   };
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-5 py-8 text-foreground sm:px-8">
+      <Script
+        src="https://accounts.google.com/gsi/client"
+        strategy="afterInteractive"
+        onLoad={() => {
+          if (!googleButtonRef.current) return;
+
+          window.google.accounts.id.initialize({
+            client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
+            callback: handleGoogleResponse,
+          });
+
+          window.google.accounts.id.renderButton(
+            googleButtonRef.current,
+            {
+              theme: "outline",
+              size: "large",
+              width: 400,
+            }
+          );
+        }}
+      />
       <div className="pointer-events-none absolute -left-24 top-12 h-64 w-64 rounded-full bg-saffron/10 blur-3xl" />
       <div className="pointer-events-none absolute -right-24 bottom-8 h-72 w-72 rounded-full bg-green/10 blur-3xl" />
 
@@ -118,9 +209,32 @@ export default function login() {
                 </div>
               </div>
 
-              <button disabled={loading} type="submit" className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-saffron px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-saffron/20 transition hover:-translate-y-0.5 hover:bg-saffron-deep active:translate-y-0">
-                {loading ? "Signing in..." : "Sign in"} <span aria-hidden="true" className="text-lg leading-none">→</span>
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-saffron px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-saffron/20 transition hover:-translate-y-0.5 hover:bg-saffron-deep active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {loading ? "Signing up..." : "Create account"}
+
+                {!loading && (
+                  <span aria-hidden="true" className="text-lg leading-none">
+                    →
+                  </span>
+                )}
               </button>
+
+              {/* Divider */}
+              <div className="flex items-center gap-3 py-2">
+                <div className="h-px flex-1 bg-foreground/10" />
+                <span className="text-xs font-medium text-muted">OR</span>
+                <div className="h-px flex-1 bg-foreground/10" />
+              </div>
+
+              {/* Google Signup */}
+              <div
+                ref={googleButtonRef}
+                className="flex w-full justify-center"
+              />
             </form>
 
             <div className="mt-8 flex items-center gap-3 rounded-xl border border-green/15 bg-green/5 px-4 py-3 text-xs text-muted">
