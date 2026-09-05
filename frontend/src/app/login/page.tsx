@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function login() {
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-5 py-8 text-foreground sm:px-8">
@@ -10,10 +12,10 @@ export default function login() {
           <div className="absolute -bottom-24 -left-16 h-56 w-56 rounded-full border-[28px] border-green/25" />
 
           <div className="relative">
-            <a href="/" className="inline-flex items-center gap-3 font-[var(--font-fraunces)] text-2xl font-semibold">
+            <Link href="/" className="inline-flex items-center gap-3 font-[var(--font-fraunces)] text-2xl font-semibold">
               <span className="grid h-10 w-10 place-items-center rounded-xl bg-saffron text-lg text-white shadow-lg shadow-saffron/20">YS</span>
               Yojana Setu
-            </a>
+            </Link>
             <div className="mt-20 max-w-sm">
               <p className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-saffron">Your next opportunity</p>
               <h2 className="font-[var(--font-fraunces)] text-5xl leading-[1.05]">A clearer path to support.</h2>
@@ -29,10 +31,10 @@ export default function login() {
 
         <section className="p-6 sm:p-10 lg:p-14">
           <div className="mb-9 flex items-center justify-between lg:hidden">
-            <a href="/" className="inline-flex items-center gap-2 font-[var(--font-fraunces)] text-2xl font-semibold">
+            <Link href="/" className="inline-flex items-center gap-2 font-[var(--font-fraunces)] text-2xl font-semibold">
               <span className="grid h-9 w-9 place-items-center rounded-lg bg-saffron text-sm text-white">YS</span>
               Yojana Setu
-            </a>
+            </Link>
             <span className="rounded-full bg-green/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-green">Secure access</span>
           </div>
 
@@ -72,10 +74,10 @@ export default function login() {
             </div>
 
             <div className="mt-8 border-t border-foreground/10 pt-6 text-center">
-              <p className="text-sm text-muted">Don&apos;t have an account? <a href="/signup" className="font-bold text-foreground underline decoration-saffron decoration-2 underline-offset-4">Create an account</a></p>
+              <p className="text-sm text-muted">Don&apos;t have an account? <Link href="/signup" className="font-bold text-foreground underline decoration-saffron decoration-2 underline-offset-4">Create an account</Link></p>
             </div>
             <div className="mt-6 text-center">
-              <a href="/" className="text-sm font-medium text-muted transition hover:text-foreground">← Back to home</a>
+              <Link href="/" className="text-sm font-medium text-muted transition hover:text-foreground">← Back to home</Link>
             </div>
           </div>
         </section>
