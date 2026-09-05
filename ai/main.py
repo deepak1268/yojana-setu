@@ -1,6 +1,16 @@
 import json
 import os
 import sys
+import uuid
+
+from dotenv import load_dotenv
+from langchain_core.chat_history import InMemoryChatMessageHistory as ChatMessageHistory
+from langchain_core.messages import SystemMessage
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_google_genai import ChatGoogleGenerativeAI
+
+load_dotenv()
 
 if hasattr(sys.stdout, 'reconfigure'):
     try:
@@ -454,36 +464,26 @@ def match_schemes(user, schemes):
     return recommendations, len(evaluated)
 
 
+SESSION_STORE = {}
+
+
+def get_session_history(session_id):
+    if session_id not in SESSION_STORE:
+        SESSION_STORE[session_id] = ChatMessageHistory()
+    return SESSION_STORE[session_id]
+
+
 class SchemeAgent:
     """
-    AI Agent that connects user_data and top_3_schemes to an LLM (Gemini).
-    Explains recommendations, answers follow-up questions, and compares schemes.
-    Strictly grounded ONLY in user_data and top_3_schemes. Retains conversation history.
+    AI Agent that explains recommendations and answers follow-up questions.
+    Strictly grounded ONLY in user_data and top_3_schemes.
     """
 
-    def __init__(self, user_data, top_3_schemes):
+    def __init__(self, user_data, top_3_schemes, session_id):
         self.user_data = user_data
         self.top_3_schemes = top_3_schemes
-        self.history = []
-
-        self.api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
-        self.use_llm = False
-        self.chat_session = None
-
-        self.system_instruction = self._build_system_instruction()
-
-        if self.api_key:
-            try:
-                import google.generativeai as genai
-                genai.configure(api_key=self.api_key)
-                model = genai.GenerativeModel(
-                    model_name="gemini-1.5-flash",
-                    system_instruction=self.system_instruction
-                )
-                self.chat_session = model.start_chat(history=[])
-                self.use_llm = True
-            except Exception as e:
-                pass
+        self.session_id = session_id
+        self.runnable = self._build_runnable()
 
     def _build_system_instruction(self):
         return f"""You are an expert Government Scheme Advisor AI agent.
@@ -505,107 +505,37 @@ Top 3 Recommended Schemes:
 {json.dumps(self.top_3_schemes, indent=2)}
 """
 
+    def _build_runnable(self):
+        prompt = ChatPromptTemplate.from_messages([
+            SystemMessage(content=self._build_system_instruction()),
+            MessagesPlaceholder(variable_name="history"),
+            ("human", "{input}"),
+        ])
+        model = ChatGoogleGenerativeAI(
+            model="gemini-2.5-flash",
+            google_api_key=os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY"),
+            temperature=0,
+        )
+        chain = prompt | model
+        return RunnableWithMessageHistory(
+            chain,
+            get_session_history,
+            input_messages_key="input",
+            history_messages_key="history",
+        )
+
     def ask(self, user_prompt):
         if not user_prompt:
             return ""
-
-        self.history.append({"role": "user", "content": user_prompt})
-
-        if self.use_llm and self.chat_session:
-            try:
-                response = self.chat_session.send_message(user_prompt)
-                ans = response.text
-                self.history.append({"role": "assistant", "content": ans})
-                return ans
-            except Exception as e:
-                pass
-
-        ans = self._generate_grounded_response(user_prompt)
-        self.history.append({"role": "assistant", "content": ans})
-        return ans
-
-    def _generate_grounded_response(self, prompt):
-        p_lower = prompt.lower()
-
-        if not self.top_3_schemes:
-            return "Based on your profile, no schemes met all mandatory eligibility requirements."
-
-        top1 = self.top_3_schemes[0]
-        s1_name = top1.get("scheme_name", "the primary scheme")
-
-        if any(w in p_lower for w in ["explain", "best", "recommend", "why top", "first option", "initial"]):
-            reasons = "\n".join([f"  • {m}" for m in top1.get("matched_rules", [])])
-            fin = top1.get("financial_details", {})
-            fin_str = ", ".join([f"{k.replace('_', ' ').title()}: {v}" for k, v in
-                                 fin.items()]) if fin else "Standard terms as per SCA guidelines"
-
-            other_options = ""
-            if len(self.top_3_schemes) > 1:
-                other_options = "\n\n**Other Suitable Options:**\n" + "\n".join(
-                    [f"  {s['rank']}. {s['scheme_name']} (Score: {s['match_score']}/100)" for s in
-                     self.top_3_schemes[1:]])
-
-            return (
-                f"Based on your profile (Category: {self.user_data.get('category')}, Income: Rs. {self.user_data.get('annual_income', 0):,}, Purpose: {self.user_data.get('purpose')}), "
-                f"the **{s1_name}** appears to be the best match with a score of {top1.get('match_score')}/100.\n\n"
-                f"**Why it was recommended for you:**\n{reasons}\n\n"
-                f"**Key Financial Details:**\n  • {fin_str}"
-                f"{other_options}"
-            )
-
-        if any(w in p_lower for w in ["better", "compare", "second", "versus", "vs", "difference", "term loan"]):
-            if len(self.top_3_schemes) > 1:
-                top2 = self.top_3_schemes[1]
-                s2_name = top2.get("scheme_name", "the second scheme")
-                return (
-                    f"Comparing **{s1_name}** (Rank 1, Score: {top1.get('match_score')}/100) vs **{s2_name}** (Rank 2, Score: {top2.get('match_score')}/100):\n\n"
-                    f"• **Fit**: {s1_name} scored higher because its financial parameters and loan fit are more closely tailored to your requested loan of Rs. {self.user_data.get('loan_required', 0):,}.\n"
-                    f"• **Financial Terms**: {s1_name} provides {json.dumps(top1.get('financial_details', {}))}, while {s2_name} offers {json.dumps(top2.get('financial_details', {}))}.\n"
-                    f"Both satisfy your category ({self.user_data.get('category')}) and income ceiling rules."
-                )
-            return f"**{s1_name}** is your primary eligible recommendation."
-
-        if "interest" in p_lower or "rate" in p_lower or "lowest" in p_lower:
-            lines = []
-            for s in self.top_3_schemes:
-                rate = s.get("financial_details", {}).get("interest_rate")
-                if rate:
-                    lines.append(f"• **{s['scheme_name']}**: {rate}")
-                else:
-                    lines.append(
-                        f"• **{s['scheme_name']}**: Interest rate details not explicitly listed in available scheme data.")
-            return "Here are the interest rates for your recommended schemes:\n" + "\n".join(lines)
-
-        if "document" in p_lower or "proof" in p_lower or "certificate" in p_lower:
-            lines = []
-            for s in self.top_3_schemes:
-                docs = s.get("documents", [])
-                doc_str = ", ".join(docs) if docs else "Standard KYC / SCA proof documents"
-                lines.append(f"• **{s['scheme_name']}**: {doc_str}")
-            return "Here are the required documents for your top schemes:\n" + "\n".join(lines)
-
-        if "3 lakh" in p_lower or "higher loan" in p_lower or "more money" in p_lower:
-            return (
-                f"Your original request was for Rs. {self.user_data.get('loan_required', 0):,}. "
-                f"If you require Rs. 3,00,000 instead, schemes with maximum loan limits equal to or above Rs. 3,00,000 (such as Term Loan schemes) would be required. "
-                f"Schemes capped below Rs. 3,00,000 would become ineligible for that amount."
-            )
-
-        summary_lines = [f"{s['rank']}. {s['scheme_name']} (Score: {s['match_score']}/100)" for s in self.top_3_schemes]
-        return (
-                f"Here is a summary of your top recommended schemes based on your profile:\n"
-                + "\n".join(summary_lines) +
-                "\n\nYou can ask about interest rates, documents required, comparisons between schemes, or specific loan terms."
+        response = self.runnable.invoke(
+            {"input": user_prompt},
+            config={"configurable": {"session_id": self.session_id}},
         )
+        return response.content
 
 
 if __name__ == "__main__":
-    json_path = "schemes.json"
-    if not os.path.exists(json_path):
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        json_path = os.path.join(script_dir, "schemes.json")
-        if not os.path.exists(json_path):
-            json_path = os.path.join(script_dir, "scratch", "scheme_data_processor", "schemes.json")
+    json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "schemes.json")
 
     print(f"Loading schemes knowledge base from: {json_path}")
     with open(json_path, "r", encoding="utf-8") as f:
@@ -634,9 +564,11 @@ if __name__ == "__main__":
     print(" GOVERNMENT SCHEME AI CHATBOT AGENT ")
     print("=" * 65)
 
+    session_id = str(uuid.uuid4())
     agent = SchemeAgent(
         user_data=user,
-        top_3_schemes=recommendations
+        top_3_schemes=recommendations,
+        session_id=session_id,
     )
 
     # AI Agent immediately explains the top recommendations
