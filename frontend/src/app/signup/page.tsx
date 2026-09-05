@@ -1,4 +1,73 @@
+"use client";
+
+import axios from "axios";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 export default function signup() {
+  const { setUser, loading, setLoading } = useAuth();
+
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+
+    const name = formData.get("name");
+    const email = formData.get("email");
+    const password = formData.get("password");
+    const confirmPassword = formData.get("confirmPassword");
+
+    // Check passwords
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/signup",
+        {
+          name,
+          email,
+          password,
+        }
+      );
+
+      const { token, user } = response.data;
+
+      // Store token
+      localStorage.setItem("token", token);
+
+      // Store user in AuthContext
+      setUser(user);
+      
+      toast.success("Account created successfully!");
+      
+      console.log("Signup successful:", user);
+
+      // You can redirect after signup
+      // window.location.href = "/dashboard";
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+
+        if (status === 409) {
+          toast.error("An account with this email already exists");
+        } else if (status === 400) {
+          toast.error(
+            error.response?.data?.message || "Please check your details"
+          );
+        } else {
+          toast.error("Something went wrong. Please try again.");
+        }
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-5 py-8 text-foreground sm:px-8">
       <div className="pointer-events-none absolute -left-24 top-12 h-64 w-64 rounded-full bg-saffron/10 blur-3xl" />
@@ -43,7 +112,7 @@ export default function signup() {
               <p className="mt-3 text-sm leading-6 text-muted">Get started and find schemes tailored to your needs.</p>
             </div>
 
-            <form className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="name" className="mb-2 block text-sm font-semibold">Full name</label>
                 <div className="relative">
@@ -74,8 +143,17 @@ export default function signup() {
                 <label htmlFor="terms" className="text-xs leading-5 text-muted">I agree to the <a href="#" className="font-semibold text-foreground underline decoration-saffron underline-offset-4">Terms of Service</a> and <a href="#" className="font-semibold text-foreground underline decoration-saffron underline-offset-4">Privacy Policy</a>.</label>
               </div>
 
-              <button type="submit" className="flex w-full items-center justify-center gap-2 rounded-xl bg-saffron px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-saffron/20 transition hover:-translate-y-0.5 hover:bg-saffron-deep active:translate-y-0">
-                Create account <span aria-hidden="true" className="text-lg leading-none">→</span>
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-saffron px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-saffron/20 transition hover:-translate-y-0.5 hover:bg-saffron-deep active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {loading ? "Signing up..." : "Create account"}
+                {!loading && (
+                  <span aria-hidden="true" className="text-lg leading-none">
+                    →
+                  </span>
+                )}
               </button>
             </form>
 

@@ -1,4 +1,61 @@
+"use client";
+
+import { useTransition } from "react";
+import axios from "axios";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 export default function login() {
+  const [isPending, startTransition] = useTransition();
+  const { setUser, loading, setLoading } = useAuth();
+
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    setLoading(true);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        {
+          email,
+          password,
+        }
+      );
+
+      const { token, user } = response.data;
+
+      // Store JWT
+      localStorage.setItem("token", token);
+
+      // Store logged-in user in AuthContext
+      setUser(user);
+
+      toast.success("Login successful!");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+
+        if (status === 401) {
+          toast.error("Invalid email or password");
+        } else if (status === 400) {
+          toast.error(
+            error.response?.data?.message || "Please check your details"
+          );
+        } else {
+          toast.error("Something went wrong. Please try again.");
+        }
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-5 py-8 text-foreground sm:px-8">
       <div className="pointer-events-none absolute -left-24 top-12 h-64 w-64 rounded-full bg-saffron/10 blur-3xl" />
@@ -43,7 +100,7 @@ export default function login() {
               <p className="mt-3 text-sm leading-6 text-muted">Login to continue to your Yojana Setu account.</p>
             </div>
 
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="email" className="mb-2 block text-sm font-semibold">Email address</label>
                 <div className="relative">
@@ -61,8 +118,8 @@ export default function login() {
                 </div>
               </div>
 
-              <button type="submit" className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-saffron px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-saffron/20 transition hover:-translate-y-0.5 hover:bg-saffron-deep active:translate-y-0">
-                Login <span aria-hidden="true" className="text-lg leading-none">→</span>
+              <button disabled={loading} type="submit" className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-saffron px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-saffron/20 transition hover:-translate-y-0.5 hover:bg-saffron-deep active:translate-y-0">
+                {loading ? "Signing in..." : "Sign in"} <span aria-hidden="true" className="text-lg leading-none">→</span>
               </button>
             </form>
 
