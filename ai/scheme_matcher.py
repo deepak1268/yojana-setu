@@ -485,6 +485,16 @@ class SchemeAgent:
         self.session_id = session_id
         self.runnable = self._build_runnable()
 
+    def get_recommendations(self):
+        """Returns the list of top recommended scheme dictionaries."""
+        return self.top_3_schemes
+
+    def get_selected_scheme_id(self):
+        """Returns the highest-ranked / first recommended scheme_id."""
+        if self.top_3_schemes and len(self.top_3_schemes) > 0:
+            return self.top_3_schemes[0].get("scheme_id")
+        return None
+
     def _build_system_instruction(self):
         return f"""You are an expert Government Scheme Advisor AI agent.
 Your ONLY job is to explain the top recommended government schemes, answer follow-up questions, and compare options for the applicant in natural, conversational language.
