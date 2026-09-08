@@ -1,4 +1,18 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { signIn } from "@/lib/auth";
+
 export default function signup() {
+  const router = useRouter();
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  e.preventDefault();
+  const name = (e.currentTarget.elements.namedItem("name") as HTMLInputElement)?.value;
+  signIn(name);
+  router.push("/dashboard");
+}
+
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-5 py-8 text-foreground sm:px-8">
       <div className="pointer-events-none absolute -left-24 top-12 h-64 w-64 rounded-full bg-saffron/10 blur-3xl" />
@@ -43,7 +57,7 @@ export default function signup() {
               <p className="mt-3 text-sm leading-6 text-muted">Get started and find schemes tailored to your needs.</p>
             </div>
 
-            <form className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="name" className="mb-2 block text-sm font-semibold">Full name</label>
                 <div className="relative">

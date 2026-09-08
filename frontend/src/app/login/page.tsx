@@ -1,4 +1,17 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { signIn } from "@/lib/auth";
+
 export default function login() {
+  const router = useRouter();
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    signIn();
+    router.push("/dashboard");
+  }
+
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-5 py-8 text-foreground sm:px-8">
       <div className="pointer-events-none absolute -left-24 top-12 h-64 w-64 rounded-full bg-saffron/10 blur-3xl" />
@@ -43,7 +56,7 @@ export default function login() {
               <p className="mt-3 text-sm leading-6 text-muted">Login to continue to your Yojana Setu account.</p>
             </div>
 
-            <form className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label htmlFor="email" className="mb-2 block text-sm font-semibold">Email address</label>
                 <div className="relative">
