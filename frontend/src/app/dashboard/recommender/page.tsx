@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Topbar } from "@/components/dashboard/Topbar";
-import { fetchSchemeMatches } from "@/lib/api";
+import { fetchSchemeChat, fetchSchemeMatches } from "@/lib/api";
 import type { SchemeRecommendation, UserProfile } from "@/lib/types";
 
 const categories = ["SC", "ST", "OBC", "General"];
@@ -27,11 +27,67 @@ const initial: UserProfile = {
   loan_required: 90000,
 };
 
+interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+}
+
+const suggestedPrompts = [
+  "Why was this scheme recommended?",
+  "What are the eligibility requirements?",
+  "How much loan can I get?",
+  "What is the interest rate?",
+  "What documents are required?",
+  "Which of the 3 schemes is better for me?",
+  "Can I use this scheme for my purpose?",
+];
+
 export default function RecommenderPage() {
   const [form, setForm] = useState<UserProfile>(initial);
   const [results, setResults] = useState<SchemeRecommendation[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Chatbot states
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatInput, setChatInput] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatError, setChatError] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string>("");
+  const chatEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = window.localStorage.getItem("ys_last_recommendations");
+      const storedProfile = window.localStorage.getItem("ys_user_profile");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored) as SchemeRecommendation[];
+          if (parsed && parsed.length > 0) {
+            setResults(parsed);
+          }
+        } catch {
+          // Ignore parse error
+        }
+      }
+      if (storedProfile) {
+        try {
+          const parsedProf = JSON.parse(storedProfile) as UserProfile;
+          if (parsedProf) setForm(parsedProf);
+        } catch {
+          // Ignore
+        }
+      }
+      setSessionId(Math.random().toString(36).substring(2, 11));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (chatMessages.length > 0) {
+      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatMessages, chatLoading]);
 
   function update<K extends keyof UserProfile>(key: K, value: UserProfile[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -44,6 +100,9 @@ export default function RecommenderPage() {
     try {
       const res = await fetchSchemeMatches(form);
       setResults(res.recommendations);
+      const newSession = Math.random().toString(36).substring(2, 11);
+      setSessionId(newSession);
+      setChatMessages([]);
       if (typeof window !== "undefined") {
         window.localStorage.setItem("ys_last_recommendations", JSON.stringify(res.recommendations));
         window.localStorage.setItem("ys_user_profile", JSON.stringify(form));
@@ -52,6 +111,42 @@ export default function RecommenderPage() {
       setError(err instanceof Error ? err.message : "Failed to fetch scheme recommendations.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleSendChat(question?: string) {
+    const text = (question || chatInput).trim();
+    if (!text || chatLoading || !results || results.length === 0) return;
+
+    const userMsg: ChatMessage = {
+      id: Math.random().toString(36).substring(2, 9),
+      role: "user",
+      content: text,
+    };
+
+    setChatMessages((prev) => [...prev, userMsg]);
+    setChatInput("");
+    setChatLoading(true);
+    setChatError(null);
+
+    try {
+      const res = await fetchSchemeChat({
+        session_id: sessionId,
+        message: text,
+        scheme_ids: results.map((r) => r.scheme_id),
+        user_data: form,
+      });
+
+      const aiMsg: ChatMessage = {
+        id: Math.random().toString(36).substring(2, 9),
+        role: "assistant",
+        content: res.response || "No response received.",
+      };
+      setChatMessages((prev) => [...prev, aiMsg]);
+    } catch (err) {
+      setChatError(err instanceof Error ? err.message : "Failed to get response from AI Chatbot.");
+    } finally {
+      setChatLoading(false);
     }
   }
 
@@ -229,6 +324,12 @@ export default function RecommenderPage() {
               </div>
             )}
 
+            {results && results.length === 0 && !error && (
+              <div className="rounded-3xl border border-dashed border-navy/15 p-8 text-center text-sm text-muted">
+                No recommendation available.
+              </div>
+            )}
+
             {results?.map((r) => (
               <div key={r.scheme_id} className="rounded-3xl bg-navy p-6 text-cream">
                 <div className="flex items-start justify-between gap-3">
@@ -284,6 +385,112 @@ export default function RecommenderPage() {
                 </a>
               </div>
             ))}
+
+            {results && results.length > 0 && (
+              <div className="rounded-3xl border border-navy/10 bg-card p-6 sm:p-7 shadow-xs">
+                <div className="flex items-center justify-between border-b border-navy/10 pb-4">
+                  <div>
+                    <h3 className="font-display text-lg text-ink flex items-center gap-2">
+                      <span className="flex h-2.5 w-2.5 rounded-full bg-green" />
+                      AI Scheme Advisor
+                    </h3>
+                    <p className="text-xs text-muted mt-0.5">
+                      Ask follow-up questions specifically about your recommended schemes.
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-saffron/15 px-3 py-1 text-xs font-semibold text-saffron-deep">
+                    Python AI
+                  </span>
+                </div>
+
+                {/* Suggested prompt chips */}
+                <div className="mt-4 flex flex-wrap gap-1.5">
+                  {suggestedPrompts.map((prompt) => (
+                    <button
+                      key={prompt}
+                      type="button"
+                      disabled={chatLoading}
+                      onClick={() => handleSendChat(prompt)}
+                      className="rounded-full border border-navy/15 bg-background px-3 py-1 text-xs font-medium text-ink transition hover:border-saffron hover:bg-saffron/5 hover:text-saffron-deep disabled:opacity-50 text-left"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Message stream */}
+                <div className="mt-4 max-h-[360px] min-h-[140px] overflow-y-auto rounded-2xl border border-navy/10 bg-background/50 p-4 space-y-3">
+                  {chatMessages.length === 0 && (
+                    <p className="text-xs text-muted text-center py-6">
+                      Click any question above or type below to ask follow-up questions about these recommended schemes.
+                    </p>
+                  )}
+
+                  {chatMessages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                    >
+                      <div
+                        className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-xs sm:text-sm whitespace-pre-wrap leading-relaxed ${
+                          msg.role === "user"
+                            ? "bg-navy text-cream rounded-br-none"
+                            : "bg-card border border-navy/10 text-ink rounded-bl-none shadow-xs"
+                        }`}
+                      >
+                        {msg.content}
+                      </div>
+                    </div>
+                  ))}
+
+                  {chatLoading && (
+                    <div className="flex justify-start">
+                      <div className="rounded-2xl rounded-bl-none border border-navy/10 bg-card px-4 py-2.5 text-xs text-muted shadow-xs">
+                        <span className="inline-flex items-center gap-1.5">
+                          <span className="h-1.5 w-1.5 rounded-full bg-saffron animate-pulse" />
+                          <span className="h-1.5 w-1.5 rounded-full bg-saffron animate-pulse delay-100" />
+                          <span className="h-1.5 w-1.5 rounded-full bg-saffron animate-pulse delay-200" />
+                          Consulting scheme knowledge base...
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {chatError && (
+                    <p className="text-xs text-red-600 bg-red-500/10 p-2.5 rounded-xl border border-red-500/20">
+                      {chatError}
+                    </p>
+                  )}
+                  <div ref={chatEndRef} />
+                </div>
+
+                {/* Chat input form */}
+                <div className="mt-3 flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Ask a question about your recommended schemes..."
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSendChat();
+                      }
+                    }}
+                    disabled={chatLoading}
+                    className="flex-1 rounded-xl border border-navy/15 bg-background px-4 py-2.5 text-xs sm:text-sm outline-none focus:border-saffron focus:ring-4 focus:ring-saffron/10 disabled:opacity-50"
+                  />
+                  <button
+                    type="button"
+                    disabled={chatLoading || !chatInput.trim()}
+                    onClick={() => handleSendChat()}
+                    className="rounded-xl bg-saffron px-4 py-2.5 text-xs sm:text-sm font-semibold text-white hover:bg-saffron-deep disabled:opacity-50 transition"
+                  >
+                    Send
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </form>
       </div>

@@ -106,9 +106,50 @@ export interface EmiCalculatorResponse {
   amortization_schedule: AmortizationRow[];
 }
 
+// Scheme summary from GET /schemes
+export interface SchemeSummary {
+  scheme_id: string;
+  name: string;
+  description?: string;
+  max_amount?: number | null;
+  min_amount?: number | null;
+  interest_rate?: number | null;
+  interest_rate_str?: string;
+  min_rate?: number | null;
+  max_rate?: number | null;
+  max_tenure?: number | null;
+  min_tenure?: number | null;
+  max_moratorium?: number | null;
+  min_moratorium?: number | null;
+  categories?: string[];
+  gender?: string[];
+  purpose?: string[];
+  states?: string[];
+}
+
+export interface SchemeListResponse {
+  schemes: SchemeSummary[];
+  total: number;
+}
+
+// FastAPI Request for POST /schemes/chat
+export interface SchemeChatRequest {
+  session_id?: string;
+  message: string;
+  scheme_ids: string[];
+  user_data?: Partial<UserProfile>;
+}
+
+// FastAPI Response for POST /schemes/chat
+export interface SchemeChatResponse {
+  session_id: string;
+  response: string;
+}
+
 // FastAPI Request for POST /partners/locate
 export interface PartnerLocateRequest {
-  scheme_id: string;
+  scheme_id?: string;
+  scheme_ids?: string[];
   latitude: number;
   longitude: number;
 }

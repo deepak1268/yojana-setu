@@ -185,16 +185,19 @@ def calculate_distance(lat1, lon1, lat2, lon2):
 def check_partner_eligibility(partner, selected_scheme_id):
     """
     Checks if a partner is active, supports the scheme(s), and meets risk/utilization thresholds.
-    selected_scheme_id can be a single scheme ID string or a list of scheme ID strings.
+    selected_scheme_id can be a single scheme ID string or a list/set of scheme ID strings.
     """
     if not partner.get("active", False):
         return False
-    
-    if isinstance(selected_scheme_id, list):
-        if not any(sid in partner.get("supported_schemes", []) for sid in selected_scheme_id):
+
+    supported = {s.upper() for s in partner.get("supported_schemes", [])}
+    if isinstance(selected_scheme_id, (list, tuple, set)):
+        targets = {sid.upper() for sid in selected_scheme_id if sid}
+        if not targets.intersection(supported):
             return False
-    elif selected_scheme_id not in partner.get("supported_schemes", []):
-        return False
+    else:
+        if not selected_scheme_id or selected_scheme_id.upper() not in supported:
+            return False
 
     if partner.get("fund_utilization_percent", 100) >= MAX_FUND_UTILIZATION:
         return False

@@ -1,0 +1,2682 @@
+[
+    {
+        "partner_id": "P001",
+        "name": "Delhi State Channelizing Agency",
+        "type": "SCA",
+        "state": "Delhi",
+        "city": "New Delhi",
+        "latitude": 28.5664,
+        "longitude": 77.1865,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 36.5,
+        "npa_percent": 1.1,
+        "overdue_percent": 2.9,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P002",
+        "name": "State Bank Partner - New Delhi",
+        "type": "PSB",
+        "state": "Delhi",
+        "city": "New Delhi",
+        "latitude": 28.5666,
+        "longitude": 77.1789,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 35.3,
+        "npa_percent": 5.3,
+        "overdue_percent": 6.6,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P003",
+        "name": "Delhi Regional Rural Bank - New Delhi Branch",
+        "type": "RRB",
+        "state": "Delhi",
+        "city": "New Delhi",
+        "latitude": 28.5917,
+        "longitude": 77.1805,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 74.8,
+        "npa_percent": 4.1,
+        "overdue_percent": 7.5,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P004",
+        "name": "Haryana State Channelizing Agency",
+        "type": "SCA",
+        "state": "Haryana",
+        "city": "Gurugram",
+        "latitude": 28.4631,
+        "longitude": 77.0739,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 68.1,
+        "npa_percent": 0.8,
+        "overdue_percent": 2.8,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P005",
+        "name": "State Bank Partner - Gurugram",
+        "type": "PSB",
+        "state": "Haryana",
+        "city": "Gurugram",
+        "latitude": 28.508,
+        "longitude": 77.0621,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 52.1,
+        "npa_percent": 2.7,
+        "overdue_percent": 2.7,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P006",
+        "name": "Haryana Regional Rural Bank - Gurugram Branch",
+        "type": "RRB",
+        "state": "Haryana",
+        "city": "Gurugram",
+        "latitude": 28.4797,
+        "longitude": 77.045,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 52.8,
+        "npa_percent": 6.4,
+        "overdue_percent": 6.1,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P007",
+        "name": "Gramin Microfinance Partner - Gurugram",
+        "type": "NBFC-MFI",
+        "state": "Haryana",
+        "city": "Gurugram",
+        "latitude": 28.4315,
+        "longitude": 77.009,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 38.1,
+        "npa_percent": 6.0,
+        "overdue_percent": 5.5,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P008",
+        "name": "Haryana State Channelizing Agency",
+        "type": "SCA",
+        "state": "Haryana",
+        "city": "Faridabad",
+        "latitude": 28.3802,
+        "longitude": 77.3177,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 61.4,
+        "npa_percent": 2.1,
+        "overdue_percent": 5.7,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P009",
+        "name": "State Bank Partner - Faridabad",
+        "type": "PSB",
+        "state": "Haryana",
+        "city": "Faridabad",
+        "latitude": 28.3988,
+        "longitude": 77.2897,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 75.5,
+        "npa_percent": 1.4,
+        "overdue_percent": 2.3,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P010",
+        "name": "Haryana Regional Rural Bank - Faridabad Branch",
+        "type": "RRB",
+        "state": "Haryana",
+        "city": "Faridabad",
+        "latitude": 28.4011,
+        "longitude": 77.2742,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 75.5,
+        "npa_percent": 0.6,
+        "overdue_percent": 6.8,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P011",
+        "name": "Gramin Microfinance Partner - Faridabad",
+        "type": "NBFC-MFI",
+        "state": "Haryana",
+        "city": "Faridabad",
+        "latitude": 28.4474,
+        "longitude": 77.3429,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 35.2,
+        "npa_percent": 4.8,
+        "overdue_percent": 6.8,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P012",
+        "name": "Uttar Pradesh State Channelizing Agency",
+        "type": "SCA",
+        "state": "Uttar Pradesh",
+        "city": "Noida",
+        "latitude": 28.5363,
+        "longitude": 77.3516,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 42.6,
+        "npa_percent": 6.2,
+        "overdue_percent": 8.4,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P013",
+        "name": "State Bank Partner - Noida",
+        "type": "PSB",
+        "state": "Uttar Pradesh",
+        "city": "Noida",
+        "latitude": 28.5454,
+        "longitude": 77.3899,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 76.3,
+        "npa_percent": 6.2,
+        "overdue_percent": 1.7,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P014",
+        "name": "Uttar Pradesh Regional Rural Bank - Noida Branch",
+        "type": "RRB",
+        "state": "Uttar Pradesh",
+        "city": "Noida",
+        "latitude": 28.5671,
+        "longitude": 77.4388,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 76.0,
+        "npa_percent": 3.0,
+        "overdue_percent": 2.7,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P015",
+        "name": "Uttar Pradesh State Channelizing Agency",
+        "type": "SCA",
+        "state": "Uttar Pradesh",
+        "city": "Lucknow",
+        "latitude": 26.868,
+        "longitude": 80.9361,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 38.0,
+        "npa_percent": 0.6,
+        "overdue_percent": 5.4,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P016",
+        "name": "State Bank Partner - Lucknow",
+        "type": "PSB",
+        "state": "Uttar Pradesh",
+        "city": "Lucknow",
+        "latitude": 26.8187,
+        "longitude": 80.9033,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 38.3,
+        "npa_percent": 1.9,
+        "overdue_percent": 6.4,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P017",
+        "name": "Uttar Pradesh Regional Rural Bank - Lucknow Branch",
+        "type": "RRB",
+        "state": "Uttar Pradesh",
+        "city": "Lucknow",
+        "latitude": 26.8506,
+        "longitude": 80.9685,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 39.6,
+        "npa_percent": 3.1,
+        "overdue_percent": 4.4,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P018",
+        "name": "Uttar Pradesh State Channelizing Agency",
+        "type": "SCA",
+        "state": "Uttar Pradesh",
+        "city": "Kanpur",
+        "latitude": 26.4672,
+        "longitude": 80.3803,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 40.1,
+        "npa_percent": 1.6,
+        "overdue_percent": 5.3,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P019",
+        "name": "State Bank Partner - Kanpur",
+        "type": "PSB",
+        "state": "Uttar Pradesh",
+        "city": "Kanpur",
+        "latitude": 26.4421,
+        "longitude": 80.3098,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 82.0,
+        "npa_percent": 5.5,
+        "overdue_percent": 8.8,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P020",
+        "name": "Uttar Pradesh Regional Rural Bank - Kanpur Branch",
+        "type": "RRB",
+        "state": "Uttar Pradesh",
+        "city": "Kanpur",
+        "latitude": 26.4165,
+        "longitude": 80.3305,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 81.3,
+        "npa_percent": 2.1,
+        "overdue_percent": 7.3,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P021",
+        "name": "Rajasthan State Channelizing Agency",
+        "type": "SCA",
+        "state": "Rajasthan",
+        "city": "Jaipur",
+        "latitude": 26.9047,
+        "longitude": 75.833,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 37.7,
+        "npa_percent": 4.9,
+        "overdue_percent": 1.5,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P022",
+        "name": "State Bank Partner - Jaipur",
+        "type": "PSB",
+        "state": "Rajasthan",
+        "city": "Jaipur",
+        "latitude": 26.8681,
+        "longitude": 75.7957,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 38.2,
+        "npa_percent": 5.7,
+        "overdue_percent": 4.2,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P023",
+        "name": "Rajasthan Regional Rural Bank - Jaipur Branch",
+        "type": "RRB",
+        "state": "Rajasthan",
+        "city": "Jaipur",
+        "latitude": 26.887,
+        "longitude": 75.7968,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 68.7,
+        "npa_percent": 1.9,
+        "overdue_percent": 4.2,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P024",
+        "name": "Gramin Microfinance Partner - Jaipur",
+        "type": "NBFC-MFI",
+        "state": "Rajasthan",
+        "city": "Jaipur",
+        "latitude": 26.927,
+        "longitude": 75.783,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 45.0,
+        "npa_percent": 2.1,
+        "overdue_percent": 8.5,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P025",
+        "name": "Rajasthan State Channelizing Agency",
+        "type": "SCA",
+        "state": "Rajasthan",
+        "city": "Jodhpur",
+        "latitude": 26.2259,
+        "longitude": 72.9901,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 39.9,
+        "npa_percent": 5.8,
+        "overdue_percent": 3.1,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P026",
+        "name": "State Bank Partner - Jodhpur",
+        "type": "PSB",
+        "state": "Rajasthan",
+        "city": "Jodhpur",
+        "latitude": 26.2631,
+        "longitude": 72.9898,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 64.8,
+        "npa_percent": 2.1,
+        "overdue_percent": 4.9,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P027",
+        "name": "Rajasthan Regional Rural Bank - Jodhpur Branch",
+        "type": "RRB",
+        "state": "Rajasthan",
+        "city": "Jodhpur",
+        "latitude": 26.1981,
+        "longitude": 73.0167,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 64.9,
+        "npa_percent": 2.1,
+        "overdue_percent": 6.9,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P028",
+        "name": "Punjab State Channelizing Agency",
+        "type": "SCA",
+        "state": "Punjab",
+        "city": "Chandigarh",
+        "latitude": 30.7394,
+        "longitude": 76.7406,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 42.0,
+        "npa_percent": 1.3,
+        "overdue_percent": 3.5,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P029",
+        "name": "State Bank Partner - Chandigarh",
+        "type": "PSB",
+        "state": "Punjab",
+        "city": "Chandigarh",
+        "latitude": 30.7732,
+        "longitude": 76.7504,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 76.6,
+        "npa_percent": 2.9,
+        "overdue_percent": 6.0,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P030",
+        "name": "Punjab Regional Rural Bank - Chandigarh Branch",
+        "type": "RRB",
+        "state": "Punjab",
+        "city": "Chandigarh",
+        "latitude": 30.7759,
+        "longitude": 76.7531,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 78.5,
+        "npa_percent": 5.2,
+        "overdue_percent": 4.3,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P031",
+        "name": "Gramin Microfinance Partner - Chandigarh",
+        "type": "NBFC-MFI",
+        "state": "Punjab",
+        "city": "Chandigarh",
+        "latitude": 30.7697,
+        "longitude": 76.8105,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 75.4,
+        "npa_percent": 1.8,
+        "overdue_percent": 7.5,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P032",
+        "name": "Punjab State Channelizing Agency",
+        "type": "SCA",
+        "state": "Punjab",
+        "city": "Ludhiana",
+        "latitude": 30.8815,
+        "longitude": 75.8868,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 48.1,
+        "npa_percent": 0.9,
+        "overdue_percent": 7.2,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P033",
+        "name": "State Bank Partner - Ludhiana",
+        "type": "PSB",
+        "state": "Punjab",
+        "city": "Ludhiana",
+        "latitude": 30.9151,
+        "longitude": 75.8473,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 80.2,
+        "npa_percent": 2.1,
+        "overdue_percent": 1.9,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P034",
+        "name": "Punjab Regional Rural Bank - Ludhiana Branch",
+        "type": "RRB",
+        "state": "Punjab",
+        "city": "Ludhiana",
+        "latitude": 30.8856,
+        "longitude": 75.8859,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 43.9,
+        "npa_percent": 0.8,
+        "overdue_percent": 4.5,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P035",
+        "name": "Gramin Microfinance Partner - Ludhiana",
+        "type": "NBFC-MFI",
+        "state": "Punjab",
+        "city": "Ludhiana",
+        "latitude": 30.9436,
+        "longitude": 75.8611,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 78.3,
+        "npa_percent": 4.2,
+        "overdue_percent": 6.3,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P036",
+        "name": "Maharashtra State Channelizing Agency",
+        "type": "SCA",
+        "state": "Maharashtra",
+        "city": "Mumbai",
+        "latitude": 19.0767,
+        "longitude": 72.8944,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 66.3,
+        "npa_percent": 2.8,
+        "overdue_percent": 7.0,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P037",
+        "name": "State Bank Partner - Mumbai",
+        "type": "PSB",
+        "state": "Maharashtra",
+        "city": "Mumbai",
+        "latitude": 19.0876,
+        "longitude": 72.8578,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 62.3,
+        "npa_percent": 4.4,
+        "overdue_percent": 4.7,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P038",
+        "name": "Maharashtra Regional Rural Bank - Mumbai Branch",
+        "type": "RRB",
+        "state": "Maharashtra",
+        "city": "Mumbai",
+        "latitude": 19.0936,
+        "longitude": 72.8788,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 64.7,
+        "npa_percent": 2.5,
+        "overdue_percent": 7.5,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P039",
+        "name": "Gramin Microfinance Partner - Mumbai",
+        "type": "NBFC-MFI",
+        "state": "Maharashtra",
+        "city": "Mumbai",
+        "latitude": 19.0933,
+        "longitude": 72.8502,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 57.3,
+        "npa_percent": 5.6,
+        "overdue_percent": 1.6,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P040",
+        "name": "Maharashtra State Channelizing Agency",
+        "type": "SCA",
+        "state": "Maharashtra",
+        "city": "Pune",
+        "latitude": 18.5422,
+        "longitude": 73.8451,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 75.4,
+        "npa_percent": 5.8,
+        "overdue_percent": 7.2,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P041",
+        "name": "State Bank Partner - Pune",
+        "type": "PSB",
+        "state": "Maharashtra",
+        "city": "Pune",
+        "latitude": 18.488,
+        "longitude": 73.9025,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 72.7,
+        "npa_percent": 4.5,
+        "overdue_percent": 8.9,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P042",
+        "name": "Maharashtra Regional Rural Bank - Pune Branch",
+        "type": "RRB",
+        "state": "Maharashtra",
+        "city": "Pune",
+        "latitude": 18.5021,
+        "longitude": 73.8822,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 70.0,
+        "npa_percent": 3.3,
+        "overdue_percent": 3.1,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P043",
+        "name": "Maharashtra State Channelizing Agency",
+        "type": "SCA",
+        "state": "Maharashtra",
+        "city": "Nagpur",
+        "latitude": 21.1724,
+        "longitude": 79.0903,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 46.0,
+        "npa_percent": 2.5,
+        "overdue_percent": 8.1,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P044",
+        "name": "State Bank Partner - Nagpur",
+        "type": "PSB",
+        "state": "Maharashtra",
+        "city": "Nagpur",
+        "latitude": 21.1096,
+        "longitude": 79.0613,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 50.6,
+        "npa_percent": 3.3,
+        "overdue_percent": 1.5,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P045",
+        "name": "Maharashtra Regional Rural Bank - Nagpur Branch",
+        "type": "RRB",
+        "state": "Maharashtra",
+        "city": "Nagpur",
+        "latitude": 21.1347,
+        "longitude": 79.1152,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": false,
+        "fund_utilization_percent": 51.5,
+        "npa_percent": 5.0,
+        "overdue_percent": 7.8,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P046",
+        "name": "Gramin Microfinance Partner - Nagpur",
+        "type": "NBFC-MFI",
+        "state": "Maharashtra",
+        "city": "Nagpur",
+        "latitude": 21.1496,
+        "longitude": 79.1117,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 36.4,
+        "npa_percent": 2.5,
+        "overdue_percent": 6.4,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P047",
+        "name": "Gujarat State Channelizing Agency",
+        "type": "SCA",
+        "state": "Gujarat",
+        "city": "Ahmedabad",
+        "latitude": 23.0566,
+        "longitude": 72.6134,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 41.4,
+        "npa_percent": 3.3,
+        "overdue_percent": 1.4,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P048",
+        "name": "State Bank Partner - Ahmedabad",
+        "type": "PSB",
+        "state": "Gujarat",
+        "city": "Ahmedabad",
+        "latitude": 23.0052,
+        "longitude": 72.5669,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 38.8,
+        "npa_percent": 0.6,
+        "overdue_percent": 5.3,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P049",
+        "name": "Gujarat Regional Rural Bank - Ahmedabad Branch",
+        "type": "RRB",
+        "state": "Gujarat",
+        "city": "Ahmedabad",
+        "latitude": 22.9949,
+        "longitude": 72.5283,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 64.2,
+        "npa_percent": 1.9,
+        "overdue_percent": 4.8,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P050",
+        "name": "Gujarat State Channelizing Agency",
+        "type": "SCA",
+        "state": "Gujarat",
+        "city": "Surat",
+        "latitude": 21.1667,
+        "longitude": 72.8067,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 40.1,
+        "npa_percent": 0.7,
+        "overdue_percent": 3.5,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P051",
+        "name": "State Bank Partner - Surat",
+        "type": "PSB",
+        "state": "Gujarat",
+        "city": "Surat",
+        "latitude": 21.211,
+        "longitude": 72.8186,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 49.2,
+        "npa_percent": 4.6,
+        "overdue_percent": 7.4,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P052",
+        "name": "Gujarat Regional Rural Bank - Surat Branch",
+        "type": "RRB",
+        "state": "Gujarat",
+        "city": "Surat",
+        "latitude": 21.1985,
+        "longitude": 72.8158,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 51.0,
+        "npa_percent": 5.6,
+        "overdue_percent": 7.6,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P053",
+        "name": "Madhya Pradesh State Channelizing Agency",
+        "type": "SCA",
+        "state": "Madhya Pradesh",
+        "city": "Bhopal",
+        "latitude": 23.306,
+        "longitude": 77.4262,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 59.5,
+        "npa_percent": 4.4,
+        "overdue_percent": 5.9,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P054",
+        "name": "State Bank Partner - Bhopal",
+        "type": "PSB",
+        "state": "Madhya Pradesh",
+        "city": "Bhopal",
+        "latitude": 23.2874,
+        "longitude": 77.4091,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 56.2,
+        "npa_percent": 5.0,
+        "overdue_percent": 5.6,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P055",
+        "name": "Madhya Pradesh Regional Rural Bank - Bhopal Branch",
+        "type": "RRB",
+        "state": "Madhya Pradesh",
+        "city": "Bhopal",
+        "latitude": 23.2478,
+        "longitude": 77.3655,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 47.1,
+        "npa_percent": 2.2,
+        "overdue_percent": 5.8,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P056",
+        "name": "Gramin Microfinance Partner - Bhopal",
+        "type": "NBFC-MFI",
+        "state": "Madhya Pradesh",
+        "city": "Bhopal",
+        "latitude": 23.2655,
+        "longitude": 77.4143,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 70.6,
+        "npa_percent": 4.6,
+        "overdue_percent": 6.2,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P057",
+        "name": "Madhya Pradesh State Channelizing Agency",
+        "type": "SCA",
+        "state": "Madhya Pradesh",
+        "city": "Indore",
+        "latitude": 22.7489,
+        "longitude": 75.817,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 52.3,
+        "npa_percent": 3.8,
+        "overdue_percent": 3.8,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P058",
+        "name": "State Bank Partner - Indore",
+        "type": "PSB",
+        "state": "Madhya Pradesh",
+        "city": "Indore",
+        "latitude": 22.7246,
+        "longitude": 75.8429,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 68.9,
+        "npa_percent": 2.4,
+        "overdue_percent": 6.9,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P059",
+        "name": "Madhya Pradesh Regional Rural Bank - Indore Branch",
+        "type": "RRB",
+        "state": "Madhya Pradesh",
+        "city": "Indore",
+        "latitude": 22.6881,
+        "longitude": 75.8293,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 48.9,
+        "npa_percent": 2.7,
+        "overdue_percent": 3.4,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P060",
+        "name": "Gramin Microfinance Partner - Indore",
+        "type": "NBFC-MFI",
+        "state": "Madhya Pradesh",
+        "city": "Indore",
+        "latitude": 22.723,
+        "longitude": 75.8351,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 70.4,
+        "npa_percent": 1.1,
+        "overdue_percent": 1.1,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P061",
+        "name": "Bihar State Channelizing Agency",
+        "type": "SCA",
+        "state": "Bihar",
+        "city": "Patna",
+        "latitude": 25.592,
+        "longitude": 85.1217,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 53.8,
+        "npa_percent": 0.9,
+        "overdue_percent": 6.0,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P062",
+        "name": "State Bank Partner - Patna",
+        "type": "PSB",
+        "state": "Bihar",
+        "city": "Patna",
+        "latitude": 25.5593,
+        "longitude": 85.1687,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 54.6,
+        "npa_percent": 4.1,
+        "overdue_percent": 5.9,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P063",
+        "name": "Bihar Regional Rural Bank - Patna Branch",
+        "type": "RRB",
+        "state": "Bihar",
+        "city": "Patna",
+        "latitude": 25.5821,
+        "longitude": 85.1785,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 37.8,
+        "npa_percent": 6.3,
+        "overdue_percent": 1.8,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P064",
+        "name": "Gramin Microfinance Partner - Patna",
+        "type": "NBFC-MFI",
+        "state": "Bihar",
+        "city": "Patna",
+        "latitude": 25.6067,
+        "longitude": 85.1141,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 42.4,
+        "npa_percent": 3.0,
+        "overdue_percent": 6.5,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P065",
+        "name": "Bihar State Channelizing Agency",
+        "type": "SCA",
+        "state": "Bihar",
+        "city": "Gaya",
+        "latitude": 24.7488,
+        "longitude": 84.979,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 78.4,
+        "npa_percent": 5.2,
+        "overdue_percent": 6.0,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P066",
+        "name": "State Bank Partner - Gaya",
+        "type": "PSB",
+        "state": "Bihar",
+        "city": "Gaya",
+        "latitude": 24.8259,
+        "longitude": 84.97,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 73.9,
+        "npa_percent": 0.9,
+        "overdue_percent": 2.3,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P067",
+        "name": "Bihar Regional Rural Bank - Gaya Branch",
+        "type": "RRB",
+        "state": "Bihar",
+        "city": "Gaya",
+        "latitude": 24.805,
+        "longitude": 85.0326,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 67.9,
+        "npa_percent": 6.2,
+        "overdue_percent": 5.0,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P068",
+        "name": "Gramin Microfinance Partner - Gaya",
+        "type": "NBFC-MFI",
+        "state": "Bihar",
+        "city": "Gaya",
+        "latitude": 24.7893,
+        "longitude": 85.01,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": false,
+        "fund_utilization_percent": 45.8,
+        "npa_percent": 4.5,
+        "overdue_percent": 7.9,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P069",
+        "name": "Jharkhand State Channelizing Agency",
+        "type": "SCA",
+        "state": "Jharkhand",
+        "city": "Ranchi",
+        "latitude": 23.3941,
+        "longitude": 85.3268,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 65.6,
+        "npa_percent": 6.0,
+        "overdue_percent": 2.5,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P070",
+        "name": "State Bank Partner - Ranchi",
+        "type": "PSB",
+        "state": "Jharkhand",
+        "city": "Ranchi",
+        "latitude": 23.3377,
+        "longitude": 85.341,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 66.5,
+        "npa_percent": 5.6,
+        "overdue_percent": 3.6,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P071",
+        "name": "Jharkhand Regional Rural Bank - Ranchi Branch",
+        "type": "RRB",
+        "state": "Jharkhand",
+        "city": "Ranchi",
+        "latitude": 23.3436,
+        "longitude": 85.3259,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 46.9,
+        "npa_percent": 1.2,
+        "overdue_percent": 7.2,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P072",
+        "name": "Jharkhand State Channelizing Agency",
+        "type": "SCA",
+        "state": "Jharkhand",
+        "city": "Jamshedpur",
+        "latitude": 22.8204,
+        "longitude": 86.2072,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 58.4,
+        "npa_percent": 3.2,
+        "overdue_percent": 1.4,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P073",
+        "name": "State Bank Partner - Jamshedpur",
+        "type": "PSB",
+        "state": "Jharkhand",
+        "city": "Jamshedpur",
+        "latitude": 22.8095,
+        "longitude": 86.2457,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": false,
+        "fund_utilization_percent": 64.6,
+        "npa_percent": 5.3,
+        "overdue_percent": 6.7,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P074",
+        "name": "Jharkhand Regional Rural Bank - Jamshedpur Branch",
+        "type": "RRB",
+        "state": "Jharkhand",
+        "city": "Jamshedpur",
+        "latitude": 22.8097,
+        "longitude": 86.2081,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 65.4,
+        "npa_percent": 1.4,
+        "overdue_percent": 8.5,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P075",
+        "name": "West Bengal State Channelizing Agency",
+        "type": "SCA",
+        "state": "West Bengal",
+        "city": "Kolkata",
+        "latitude": 22.5641,
+        "longitude": 88.3621,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 78.3,
+        "npa_percent": 3.5,
+        "overdue_percent": 8.0,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P076",
+        "name": "State Bank Partner - Kolkata",
+        "type": "PSB",
+        "state": "West Bengal",
+        "city": "Kolkata",
+        "latitude": 22.5502,
+        "longitude": 88.3929,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 49.0,
+        "npa_percent": 4.0,
+        "overdue_percent": 9.0,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P077",
+        "name": "West Bengal Regional Rural Bank - Kolkata Branch",
+        "type": "RRB",
+        "state": "West Bengal",
+        "city": "Kolkata",
+        "latitude": 22.6091,
+        "longitude": 88.3586,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 50.1,
+        "npa_percent": 1.6,
+        "overdue_percent": 6.6,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P078",
+        "name": "Gramin Microfinance Partner - Kolkata",
+        "type": "NBFC-MFI",
+        "state": "West Bengal",
+        "city": "Kolkata",
+        "latitude": 22.5609,
+        "longitude": 88.3995,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 73.1,
+        "npa_percent": 2.8,
+        "overdue_percent": 6.3,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P079",
+        "name": "West Bengal State Channelizing Agency",
+        "type": "SCA",
+        "state": "West Bengal",
+        "city": "Siliguri",
+        "latitude": 26.7266,
+        "longitude": 88.349,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 56.5,
+        "npa_percent": 4.8,
+        "overdue_percent": 4.3,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P080",
+        "name": "State Bank Partner - Siliguri",
+        "type": "PSB",
+        "state": "West Bengal",
+        "city": "Siliguri",
+        "latitude": 26.7741,
+        "longitude": 88.3528,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 75.1,
+        "npa_percent": 5.7,
+        "overdue_percent": 4.0,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P081",
+        "name": "West Bengal Regional Rural Bank - Siliguri Branch",
+        "type": "RRB",
+        "state": "West Bengal",
+        "city": "Siliguri",
+        "latitude": 26.7398,
+        "longitude": 88.434,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 67.2,
+        "npa_percent": 2.2,
+        "overdue_percent": 2.8,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P082",
+        "name": "Odisha State Channelizing Agency",
+        "type": "SCA",
+        "state": "Odisha",
+        "city": "Bhubaneswar",
+        "latitude": 20.3439,
+        "longitude": 85.8505,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 37.2,
+        "npa_percent": 5.3,
+        "overdue_percent": 3.3,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P083",
+        "name": "State Bank Partner - Bhubaneswar",
+        "type": "PSB",
+        "state": "Odisha",
+        "city": "Bhubaneswar",
+        "latitude": 20.2892,
+        "longitude": 85.7989,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 63.6,
+        "npa_percent": 2.8,
+        "overdue_percent": 6.5,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P084",
+        "name": "Odisha Regional Rural Bank - Bhubaneswar Branch",
+        "type": "RRB",
+        "state": "Odisha",
+        "city": "Bhubaneswar",
+        "latitude": 20.3374,
+        "longitude": 85.7888,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 35.4,
+        "npa_percent": 5.3,
+        "overdue_percent": 8.2,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P085",
+        "name": "Gramin Microfinance Partner - Bhubaneswar",
+        "type": "NBFC-MFI",
+        "state": "Odisha",
+        "city": "Bhubaneswar",
+        "latitude": 20.3008,
+        "longitude": 85.7819,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 56.5,
+        "npa_percent": 2.3,
+        "overdue_percent": 9.0,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P086",
+        "name": "Odisha State Channelizing Agency",
+        "type": "SCA",
+        "state": "Odisha",
+        "city": "Cuttack",
+        "latitude": 20.4362,
+        "longitude": 85.89,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 65.9,
+        "npa_percent": 2.1,
+        "overdue_percent": 5.5,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P087",
+        "name": "State Bank Partner - Cuttack",
+        "type": "PSB",
+        "state": "Odisha",
+        "city": "Cuttack",
+        "latitude": 20.4903,
+        "longitude": 85.9302,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 43.9,
+        "npa_percent": 2.0,
+        "overdue_percent": 7.0,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P088",
+        "name": "Odisha Regional Rural Bank - Cuttack Branch",
+        "type": "RRB",
+        "state": "Odisha",
+        "city": "Cuttack",
+        "latitude": 20.4806,
+        "longitude": 85.8465,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 36.6,
+        "npa_percent": 2.7,
+        "overdue_percent": 2.1,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P089",
+        "name": "Karnataka State Channelizing Agency",
+        "type": "SCA",
+        "state": "Karnataka",
+        "city": "Bengaluru",
+        "latitude": 12.9963,
+        "longitude": 77.5622,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 47.1,
+        "npa_percent": 5.4,
+        "overdue_percent": 4.9,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P090",
+        "name": "State Bank Partner - Bengaluru",
+        "type": "PSB",
+        "state": "Karnataka",
+        "city": "Bengaluru",
+        "latitude": 12.9963,
+        "longitude": 77.5785,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 45.6,
+        "npa_percent": 4.6,
+        "overdue_percent": 6.4,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P091",
+        "name": "Karnataka Regional Rural Bank - Bengaluru Branch",
+        "type": "RRB",
+        "state": "Karnataka",
+        "city": "Bengaluru",
+        "latitude": 13.0183,
+        "longitude": 77.6251,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 40.8,
+        "npa_percent": 2.7,
+        "overdue_percent": 7.0,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P092",
+        "name": "Gramin Microfinance Partner - Bengaluru",
+        "type": "NBFC-MFI",
+        "state": "Karnataka",
+        "city": "Bengaluru",
+        "latitude": 12.9801,
+        "longitude": 77.6268,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": false,
+        "fund_utilization_percent": 76.6,
+        "npa_percent": 3.9,
+        "overdue_percent": 8.3,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P093",
+        "name": "Karnataka State Channelizing Agency",
+        "type": "SCA",
+        "state": "Karnataka",
+        "city": "Mysuru",
+        "latitude": 12.3093,
+        "longitude": 76.6358,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 79.5,
+        "npa_percent": 2.3,
+        "overdue_percent": 4.9,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P094",
+        "name": "State Bank Partner - Mysuru",
+        "type": "PSB",
+        "state": "Karnataka",
+        "city": "Mysuru",
+        "latitude": 12.2693,
+        "longitude": 76.6432,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 69.2,
+        "npa_percent": 5.8,
+        "overdue_percent": 6.2,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P095",
+        "name": "Karnataka Regional Rural Bank - Mysuru Branch",
+        "type": "RRB",
+        "state": "Karnataka",
+        "city": "Mysuru",
+        "latitude": 12.3074,
+        "longitude": 76.6833,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 79.7,
+        "npa_percent": 5.6,
+        "overdue_percent": 1.8,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P096",
+        "name": "Tamil Nadu State Channelizing Agency",
+        "type": "SCA",
+        "state": "Tamil Nadu",
+        "city": "Chennai",
+        "latitude": 13.0871,
+        "longitude": 80.3185,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 40.7,
+        "npa_percent": 5.6,
+        "overdue_percent": 4.6,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P097",
+        "name": "State Bank Partner - Chennai",
+        "type": "PSB",
+        "state": "Tamil Nadu",
+        "city": "Chennai",
+        "latitude": 13.0539,
+        "longitude": 80.2846,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 72.0,
+        "npa_percent": 1.7,
+        "overdue_percent": 7.6,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P098",
+        "name": "Tamil Nadu Regional Rural Bank - Chennai Branch",
+        "type": "RRB",
+        "state": "Tamil Nadu",
+        "city": "Chennai",
+        "latitude": 13.0534,
+        "longitude": 80.2423,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 81.2,
+        "npa_percent": 6.4,
+        "overdue_percent": 5.3,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P099",
+        "name": "Gramin Microfinance Partner - Chennai",
+        "type": "NBFC-MFI",
+        "state": "Tamil Nadu",
+        "city": "Chennai",
+        "latitude": 13.0437,
+        "longitude": 80.3073,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 35.7,
+        "npa_percent": 2.1,
+        "overdue_percent": 2.0,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P100",
+        "name": "Tamil Nadu State Channelizing Agency",
+        "type": "SCA",
+        "state": "Tamil Nadu",
+        "city": "Coimbatore",
+        "latitude": 11.0414,
+        "longitude": 76.9534,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 79.4,
+        "npa_percent": 0.8,
+        "overdue_percent": 7.3,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P101",
+        "name": "State Bank Partner - Coimbatore",
+        "type": "PSB",
+        "state": "Tamil Nadu",
+        "city": "Coimbatore",
+        "latitude": 11.0189,
+        "longitude": 76.9516,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 40.1,
+        "npa_percent": 4.8,
+        "overdue_percent": 4.5,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P102",
+        "name": "Tamil Nadu Regional Rural Bank - Coimbatore Branch",
+        "type": "RRB",
+        "state": "Tamil Nadu",
+        "city": "Coimbatore",
+        "latitude": 10.999,
+        "longitude": 76.9206,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 59.9,
+        "npa_percent": 3.2,
+        "overdue_percent": 5.8,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P103",
+        "name": "Telangana State Channelizing Agency",
+        "type": "SCA",
+        "state": "Telangana",
+        "city": "Hyderabad",
+        "latitude": 17.4203,
+        "longitude": 78.5018,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 73.9,
+        "npa_percent": 2.9,
+        "overdue_percent": 6.8,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P104",
+        "name": "State Bank Partner - Hyderabad",
+        "type": "PSB",
+        "state": "Telangana",
+        "city": "Hyderabad",
+        "latitude": 17.3777,
+        "longitude": 78.5032,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 39.0,
+        "npa_percent": 3.1,
+        "overdue_percent": 7.0,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P105",
+        "name": "Telangana Regional Rural Bank - Hyderabad Branch",
+        "type": "RRB",
+        "state": "Telangana",
+        "city": "Hyderabad",
+        "latitude": 17.4162,
+        "longitude": 78.4923,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 66.3,
+        "npa_percent": 5.0,
+        "overdue_percent": 7.9,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P106",
+        "name": "Telangana State Channelizing Agency",
+        "type": "SCA",
+        "state": "Telangana",
+        "city": "Warangal",
+        "latitude": 18.0252,
+        "longitude": 79.6041,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 45.5,
+        "npa_percent": 1.1,
+        "overdue_percent": 7.8,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P107",
+        "name": "State Bank Partner - Warangal",
+        "type": "PSB",
+        "state": "Telangana",
+        "city": "Warangal",
+        "latitude": 17.9399,
+        "longitude": 79.572,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": false,
+        "fund_utilization_percent": 47.8,
+        "npa_percent": 5.1,
+        "overdue_percent": 8.4,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P108",
+        "name": "Telangana Regional Rural Bank - Warangal Branch",
+        "type": "RRB",
+        "state": "Telangana",
+        "city": "Warangal",
+        "latitude": 17.929,
+        "longitude": 79.6311,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 59.9,
+        "npa_percent": 2.8,
+        "overdue_percent": 4.6,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P109",
+        "name": "Andhra Pradesh State Channelizing Agency",
+        "type": "SCA",
+        "state": "Andhra Pradesh",
+        "city": "Vijayawada",
+        "latitude": 16.4874,
+        "longitude": 80.6304,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 37.3,
+        "npa_percent": 1.0,
+        "overdue_percent": 4.5,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P110",
+        "name": "State Bank Partner - Vijayawada",
+        "type": "PSB",
+        "state": "Andhra Pradesh",
+        "city": "Vijayawada",
+        "latitude": 16.5048,
+        "longitude": 80.6422,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 48.3,
+        "npa_percent": 4.6,
+        "overdue_percent": 4.9,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P111",
+        "name": "Andhra Pradesh Regional Rural Bank - Vijayawada Branch",
+        "type": "RRB",
+        "state": "Andhra Pradesh",
+        "city": "Vijayawada",
+        "latitude": 16.487,
+        "longitude": 80.6201,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 71.1,
+        "npa_percent": 5.1,
+        "overdue_percent": 3.3,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P112",
+        "name": "Gramin Microfinance Partner - Vijayawada",
+        "type": "NBFC-MFI",
+        "state": "Andhra Pradesh",
+        "city": "Vijayawada",
+        "latitude": 16.457,
+        "longitude": 80.6727,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 74.2,
+        "npa_percent": 5.3,
+        "overdue_percent": 1.6,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P113",
+        "name": "Andhra Pradesh State Channelizing Agency",
+        "type": "SCA",
+        "state": "Andhra Pradesh",
+        "city": "Visakhapatnam",
+        "latitude": 17.6804,
+        "longitude": 83.2145,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 54.6,
+        "npa_percent": 1.2,
+        "overdue_percent": 1.2,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P114",
+        "name": "State Bank Partner - Visakhapatnam",
+        "type": "PSB",
+        "state": "Andhra Pradesh",
+        "city": "Visakhapatnam",
+        "latitude": 17.654,
+        "longitude": 83.2633,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 40.0,
+        "npa_percent": 3.1,
+        "overdue_percent": 4.2,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P115",
+        "name": "Andhra Pradesh Regional Rural Bank - Visakhapatnam Branch",
+        "type": "RRB",
+        "state": "Andhra Pradesh",
+        "city": "Visakhapatnam",
+        "latitude": 17.6764,
+        "longitude": 83.1995,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 64.8,
+        "npa_percent": 3.7,
+        "overdue_percent": 2.6,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P116",
+        "name": "Kerala State Channelizing Agency",
+        "type": "SCA",
+        "state": "Kerala",
+        "city": "Thiruvananthapuram",
+        "latitude": 8.5468,
+        "longitude": 76.9685,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 43.2,
+        "npa_percent": 1.4,
+        "overdue_percent": 7.1,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P117",
+        "name": "State Bank Partner - Thiruvananthapuram",
+        "type": "PSB",
+        "state": "Kerala",
+        "city": "Thiruvananthapuram",
+        "latitude": 8.4918,
+        "longitude": 76.9639,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 64.5,
+        "npa_percent": 1.4,
+        "overdue_percent": 1.5,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P118",
+        "name": "Kerala Regional Rural Bank - Thiruvananthapuram Branch",
+        "type": "RRB",
+        "state": "Kerala",
+        "city": "Thiruvananthapuram",
+        "latitude": 8.5372,
+        "longitude": 76.9662,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 36.8,
+        "npa_percent": 2.7,
+        "overdue_percent": 3.3,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P119",
+        "name": "Gramin Microfinance Partner - Thiruvananthapuram",
+        "type": "NBFC-MFI",
+        "state": "Kerala",
+        "city": "Thiruvananthapuram",
+        "latitude": 8.5605,
+        "longitude": 76.9721,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 61.9,
+        "npa_percent": 1.6,
+        "overdue_percent": 5.8,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P120",
+        "name": "Kerala State Channelizing Agency",
+        "type": "SCA",
+        "state": "Kerala",
+        "city": "Kochi",
+        "latitude": 9.977,
+        "longitude": 76.2624,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": false,
+        "fund_utilization_percent": 68.3,
+        "npa_percent": 6.4,
+        "overdue_percent": 5.2,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P121",
+        "name": "State Bank Partner - Kochi",
+        "type": "PSB",
+        "state": "Kerala",
+        "city": "Kochi",
+        "latitude": 9.8971,
+        "longitude": 76.2546,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 37.5,
+        "npa_percent": 4.3,
+        "overdue_percent": 3.7,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P122",
+        "name": "Kerala Regional Rural Bank - Kochi Branch",
+        "type": "RRB",
+        "state": "Kerala",
+        "city": "Kochi",
+        "latitude": 9.8907,
+        "longitude": 76.2851,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 66.2,
+        "npa_percent": 6.0,
+        "overdue_percent": 3.5,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P123",
+        "name": "Assam State Channelizing Agency",
+        "type": "SCA",
+        "state": "Assam",
+        "city": "Guwahati",
+        "latitude": 26.1074,
+        "longitude": 91.7571,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 66.5,
+        "npa_percent": 5.5,
+        "overdue_percent": 6.9,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P124",
+        "name": "State Bank Partner - Guwahati",
+        "type": "PSB",
+        "state": "Assam",
+        "city": "Guwahati",
+        "latitude": 26.1857,
+        "longitude": 91.6955,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 43.5,
+        "npa_percent": 1.8,
+        "overdue_percent": 8.6,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P125",
+        "name": "Assam Regional Rural Bank - Guwahati Branch",
+        "type": "RRB",
+        "state": "Assam",
+        "city": "Guwahati",
+        "latitude": 26.1137,
+        "longitude": 91.7862,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 60.4,
+        "npa_percent": 4.9,
+        "overdue_percent": 5.2,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P126",
+        "name": "Gramin Microfinance Partner - Guwahati",
+        "type": "NBFC-MFI",
+        "state": "Assam",
+        "city": "Guwahati",
+        "latitude": 26.1282,
+        "longitude": 91.7628,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 74.1,
+        "npa_percent": 5.1,
+        "overdue_percent": 7.5,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P127",
+        "name": "Chhattisgarh State Channelizing Agency",
+        "type": "SCA",
+        "state": "Chhattisgarh",
+        "city": "Raipur",
+        "latitude": 21.2058,
+        "longitude": 81.616,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 46.2,
+        "npa_percent": 6.3,
+        "overdue_percent": 7.3,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P128",
+        "name": "State Bank Partner - Raipur",
+        "type": "PSB",
+        "state": "Chhattisgarh",
+        "city": "Raipur",
+        "latitude": 21.2382,
+        "longitude": 81.6743,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 54.7,
+        "npa_percent": 1.5,
+        "overdue_percent": 2.6,
+        "processing_capacity": "low"
+    },
+    {
+        "partner_id": "P129",
+        "name": "Chhattisgarh Regional Rural Bank - Raipur Branch",
+        "type": "RRB",
+        "state": "Chhattisgarh",
+        "city": "Raipur",
+        "latitude": 21.2152,
+        "longitude": 81.6046,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 70.9,
+        "npa_percent": 2.1,
+        "overdue_percent": 8.2,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P130",
+        "name": "Gramin Microfinance Partner - Raipur",
+        "type": "NBFC-MFI",
+        "state": "Chhattisgarh",
+        "city": "Raipur",
+        "latitude": 21.2845,
+        "longitude": 81.5888,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 53.6,
+        "npa_percent": 2.7,
+        "overdue_percent": 4.1,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P131",
+        "name": "Uttarakhand State Channelizing Agency",
+        "type": "SCA",
+        "state": "Uttarakhand",
+        "city": "Dehradun",
+        "latitude": 30.289,
+        "longitude": 78.0141,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 48.5,
+        "npa_percent": 5.5,
+        "overdue_percent": 6.6,
+        "processing_capacity": "high"
+    },
+    {
+        "partner_id": "P132",
+        "name": "State Bank Partner - Dehradun",
+        "type": "PSB",
+        "state": "Uttarakhand",
+        "city": "Dehradun",
+        "latitude": 30.3424,
+        "longitude": 78.0291,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 42.0,
+        "npa_percent": 6.1,
+        "overdue_percent": 5.9,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P133",
+        "name": "Uttarakhand Regional Rural Bank - Dehradun Branch",
+        "type": "RRB",
+        "state": "Uttarakhand",
+        "city": "Dehradun",
+        "latitude": 30.2776,
+        "longitude": 78.011,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 72.3,
+        "npa_percent": 3.2,
+        "overdue_percent": 1.9,
+        "processing_capacity": "medium"
+    },
+    {
+        "partner_id": "P134",
+        "name": "Gramin Microfinance Partner - Dehradun",
+        "type": "NBFC-MFI",
+        "state": "Uttarakhand",
+        "city": "Dehradun",
+        "latitude": 30.3262,
+        "longitude": 77.9838,
+        "supported_schemes": [
+            "EDL",
+            "MFS",
+            "MUKHYAMANTRI_SCHEME",
+            "TL"
+        ],
+        "active": true,
+        "fund_utilization_percent": 63.9,
+        "npa_percent": 1.9,
+        "overdue_percent": 4.3,
+        "processing_capacity": "low"
+    }
+]

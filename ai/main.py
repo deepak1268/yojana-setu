@@ -201,6 +201,7 @@ def match_schemes_endpoint(request: SchemeMatchRequest):
 def chat_schemes_endpoint(request: SchemeChatRequest):
     """
     Exposes existing scheme_matcher.SchemeAgent chatbot functionality.
+    Grounded strictly in schemes.json and applicant profile.
     """
     session_id = request.session_id or str(uuid.uuid4())
     schemes = fetch_schemes()
@@ -208,14 +209,31 @@ def chat_schemes_endpoint(request: SchemeChatRequest):
     if session_id not in agent_sessions:
         top_schemes = []
         if request.scheme_ids:
-            target_ids = [sid.lower() for sid in request.scheme_ids]
-            # Match top scheme dicts from schemes.json or run matcher
-            raw_matches = [s for s in schemes if s.get("scheme_id", "").lower() in target_ids]
+            target_ids = [sid.upper() for sid in request.scheme_ids]
+            raw_matches = [s for s in schemes if s.get("scheme_id", "").upper() in target_ids]
             if raw_matches and request.user_data:
                 recs, _ = match_schemes(request.user_data, raw_matches)
                 top_schemes = recs
             elif raw_matches:
-                top_schemes = raw_matches
+                for idx, s in enumerate(raw_matches, 1):
+                    details = get_scheme_details(s)
+                    top_schemes.append({
+                        "rank": idx,
+                        "scheme_id": s.get("scheme_id", ""),
+                        "scheme_name": s.get("name", ""),
+                        "match_score": 90 - (idx * 5),
+                        "eligibility_status": "eligible",
+                        "matched_rules": [f"Matches scheme {s.get('name')}"],
+                        "warnings": [],
+                        "financial_details": {
+                            "max_loan": f"Rs. {details['max_amount']:,}" if details["max_amount"] else None,
+                            "percentage_financed": f"{s.get('loan', {}).get('percentage_of_project_cost', 90)}%",
+                            "interest_rate": details["interest_rate_str"],
+                            "max_tenure": f"{details['max_tenure']} months" if details["max_tenure"] else None,
+                            "moratorium": f"{details['max_moratorium']} months" if details["max_moratorium"] else None,
+                        },
+                        "documents": s.get("documents", []),
+                    })
 
         if not top_schemes and request.user_data:
             recs, _ = match_schemes(request.user_data, schemes)
@@ -240,40 +258,62 @@ def chat_schemes_endpoint(request: SchemeChatRequest):
 @app.get(
     "/schemes",
     summary="List and Filter All Schemes",
-    description="Returns available government schemes with optional name search and category filtering for the calculator.",
+    description="Returns available government schemes with optional search and filtering (category, purpose, state, gender) for the calculator.",
     tags=["Financial Calculator"],
 )
 def list_schemes_endpoint(
     search: Optional[str] = None,
     category: Optional[str] = None,
     purpose: Optional[str] = None,
+    state: Optional[str] = None,
+    gender: Optional[str] = None,
 ):
     """
-    Returns scheme summary items from schemes.json for complete catalog browsing & filtering.
+    Returns scheme items from schemes.json for complete catalog browsing & filtering.
     """
     schemes = fetch_schemes()
     filtered = schemes
 
     if search:
-        q = search.lower()
+        q = search.lower().strip()
         filtered = [
             s for s in filtered
-            if q in s.get("name", "").lower() or q in s.get("description", "").lower() or q in s.get("scheme_id", "").lower()
+            if q in s.get("name", "").lower()
+            or q in s.get("description", "").lower()
+            or q in s.get("scheme_id", "").lower()
         ]
 
-    if category:
-        cat_q = category.lower()
+    if category and category.lower() != "all":
+        cat_q = category.lower().strip()
         filtered = [
             s for s in filtered
-            if not s.get("eligibility", {}).get("categories") or
-            any(c.lower() == cat_q for c in s.get("eligibility", {}).get("categories", []))
+            if not s.get("eligibility", {}).get("categories")
+            or any(c.lower() == cat_q for c in s.get("eligibility", {}).get("categories", []))
         ]
 
-    if purpose:
-        p_q = purpose.lower()
+    if purpose and purpose.lower() != "all":
+        p_q = purpose.lower().strip()
         filtered = [
             s for s in filtered
             if any(p.lower() == p_q for p in s.get("purpose", []))
+        ]
+
+    if state and state.lower() != "all":
+        st_q = state.lower().strip()
+        filtered = [
+            s for s in filtered
+            if s.get("geographical_scope", {}).get("type") == "central"
+            or "all_india" in [st.lower() for st in s.get("geographical_scope", {}).get("states", [])]
+            or not s.get("geographical_scope", {}).get("states")
+            or any(st.lower() == st_q for st in s.get("geographical_scope", {}).get("states", []))
+        ]
+
+    if gender and gender.lower() != "all":
+        g_q = gender.lower().strip()
+        filtered = [
+            s for s in filtered
+            if not s.get("eligibility", {}).get("gender")
+            or any(g.lower() == g_q for g in s.get("eligibility", {}).get("gender", []))
         ]
 
     result = []
@@ -282,13 +322,21 @@ def list_schemes_endpoint(
         result.append({
             "scheme_id": details["scheme_id"],
             "name": details["name"],
+            "description": s.get("description", ""),
             "max_amount": details["max_amount"],
+            "min_amount": details["min_amount"],
             "interest_rate": details["interest_rate"],
             "interest_rate_str": details["interest_rate_str"],
+            "min_rate": details["min_rate"],
+            "max_rate": details["max_rate"],
             "max_tenure": details["max_tenure"],
+            "min_tenure": details["min_tenure"],
             "max_moratorium": details["max_moratorium"],
+            "min_moratorium": details["min_moratorium"],
             "categories": s.get("eligibility", {}).get("categories", []),
+            "gender": s.get("eligibility", {}).get("gender", []),
             "purpose": s.get("purpose", []),
+            "states": s.get("geographical_scope", {}).get("states", []),
         })
 
     return {"schemes": result, "total": len(result)}
@@ -384,7 +432,7 @@ def locate_partners_endpoint(request: PartnerLocateRequest):
         raise HTTPException(status_code=400, detail="Must provide scheme_id or scheme_ids.")
 
     top_partners = get_top_partners(
-        target_scheme_ids if len(target_scheme_ids) > 1 else target_scheme_ids[0],
+        target_scheme_ids,
         request.latitude,
         request.longitude,
         partners,

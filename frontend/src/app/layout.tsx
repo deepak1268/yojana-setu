@@ -19,7 +19,11 @@ export const metadata: Metadata = {
     "Find the right concessional credit or education loan, estimate EMIs, and locate an eligible channel partner — built for SC entrepreneurs and students.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html
       lang="en"

@@ -1,6 +1,9 @@
 import type {
   UserProfile,
   SchemeMatchResponse,
+  SchemeChatRequest,
+  SchemeChatResponse,
+  SchemeListResponse,
   EmiCalculatorRequest,
   EmiCalculatorResponse,
   PartnerLocateRequest,
@@ -34,8 +37,55 @@ async function postJson<T>(endpoint: string, body: unknown): Promise<T> {
   return response.json() as Promise<T>;
 }
 
+async function getJson<T>(endpoint: string, params?: Record<string, string | undefined>): Promise<T> {
+  const url = new URL(`${API_BASE_URL}${endpoint}`);
+  if (params) {
+    Object.entries(params).forEach(([key, val]) => {
+      if (val !== undefined && val !== null && val.trim() !== "") {
+        url.searchParams.append(key, val);
+      }
+    });
+  }
+
+  const response = await fetch(url.toString(), {
+    method: "GET",
+    headers: {
+      "Accept": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    let errorMessage = `HTTP error ${response.status}`;
+    try {
+      const errorData = await response.json();
+      if (errorData.detail) {
+        errorMessage = typeof errorData.detail === "string" ? errorData.detail : JSON.stringify(errorData.detail);
+      }
+    } catch {
+      // Ignore JSON parse error
+    }
+    throw new Error(errorMessage);
+  }
+
+  return response.json() as Promise<T>;
+}
+
 export async function fetchSchemeMatches(userProfile: UserProfile): Promise<SchemeMatchResponse> {
   return postJson<SchemeMatchResponse>("/schemes/match", userProfile);
+}
+
+export async function fetchSchemeChat(request: SchemeChatRequest): Promise<SchemeChatResponse> {
+  return postJson<SchemeChatResponse>("/schemes/chat", request);
+}
+
+export async function fetchSchemes(params?: {
+  search?: string;
+  category?: string;
+  purpose?: string;
+  state?: string;
+  gender?: string;
+}): Promise<SchemeListResponse> {
+  return getJson<SchemeListResponse>("/schemes", params);
 }
 
 export async function fetchEmiCalculation(request: EmiCalculatorRequest): Promise<EmiCalculatorResponse> {
