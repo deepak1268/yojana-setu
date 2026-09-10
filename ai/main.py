@@ -444,6 +444,12 @@ def locate_partners_endpoint(request: PartnerLocateRequest):
             "message": "No eligible channel partner found.",
         }
 
+    for p in top_partners:
+        if "_distance_km" in p:
+            p["distance_km"] = round(p["_distance_km"], 1)
+        if "type" in p and "partner_type" not in p:
+            p["partner_type"] = p["type"]
+
     return {
         "partners": top_partners,
     }

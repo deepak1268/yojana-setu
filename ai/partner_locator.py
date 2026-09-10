@@ -26,8 +26,9 @@ WEIGHT_NPA = 0.15
 WEIGHT_OVERDUE = 0.10
 WEIGHT_CAPACITY = 0.10
 
-PARTNERS_FILE = "partners.json"
-SCHEMES_FILE = "schemes.json"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PARTNERS_FILE = os.path.join(BASE_DIR, "partners.json")
+SCHEMES_FILE = os.path.join(BASE_DIR, "schemes.json")
 
 
 def generate_dummy_partners(schemes_filepath=SCHEMES_FILE):

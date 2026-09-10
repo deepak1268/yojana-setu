@@ -42,6 +42,7 @@ export interface Partner {
   partner_id: string;
   name: string;
   type: "SCA" | "PSB" | "RRB" | "NBFC-MFI";
+  partner_type?: string;
   state: string;
   city: string;
   latitude: number;
@@ -56,8 +57,9 @@ export interface Partner {
 
 // Extra fields partner_locator.py attaches after ranking (rank_partners)
 export interface RankedPartner extends Partner {
-  _routing_score: number;
-  _distance_km: number;
+  _routing_score?: number;
+  _distance_km?: number;
+  distance_km?: number;
 }
 
 // FastAPI Response for POST /schemes/match
