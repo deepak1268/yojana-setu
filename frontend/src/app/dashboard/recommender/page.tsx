@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Topbar } from "@/components/dashboard/Topbar";
-import { sampleRecommendations } from "@/lib/mock-data";
+import { fetchSchemeMatches } from "@/lib/api";
 import type { SchemeRecommendation, UserProfile } from "@/lib/types";
 
 const categories = ["SC", "ST", "OBC", "General"];
@@ -30,19 +30,28 @@ const initial: UserProfile = {
 export default function RecommenderPage() {
   const [form, setForm] = useState<UserProfile>(initial);
   const [results, setResults] = useState<SchemeRecommendation[] | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   function update<K extends keyof UserProfile>(key: K, value: UserProfile[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // NOTE: real scoring lives in ai/scheme_matcher.py (match_schemes) and needs
-    // a backend endpoint. Until that exists, this shows the sample dataset
-    // shaped exactly like match_schemes()'s output so the UI is ready to swap in.
-    setResults(sampleRecommendations);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("ys_last_recommendations", JSON.stringify(sampleRecommendations));
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetchSchemeMatches(form);
+      setResults(res.recommendations);
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("ys_last_recommendations", JSON.stringify(res.recommendations));
+        window.localStorage.setItem("ys_user_profile", JSON.stringify(form));
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to fetch scheme recommendations.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -200,16 +209,23 @@ export default function RecommenderPage() {
 
             <button
               type="submit"
-              className="w-full rounded-full bg-saffron px-5 py-3 text-sm font-semibold text-white hover:bg-saffron-deep"
+              disabled={loading}
+              className="w-full rounded-full bg-saffron px-5 py-3 text-sm font-semibold text-white hover:bg-saffron-deep disabled:opacity-50"
             >
-              Find matching schemes
+              {loading ? "Finding matching schemes..." : "Find matching schemes"}
             </button>
           </div>
 
           <div className="space-y-4">
-            {!results && (
+            {error && (
+              <div className="rounded-3xl border border-red-500/20 bg-red-500/10 p-6 text-sm text-red-600">
+                {error}
+              </div>
+            )}
+
+            {!results && !error && (
               <div className="rounded-3xl border border-dashed border-navy/15 p-8 text-center text-sm text-muted">
-                Fill in the form and submit to see your top matched schemes.
+                {loading ? "Matching applicant profile against schemes..." : "Fill in the form and submit to see your top matched schemes."}
               </div>
             )}
 

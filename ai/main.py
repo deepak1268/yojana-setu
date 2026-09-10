@@ -7,6 +7,7 @@ via REST API endpoints while strictly preserving underlying business logic.
 
 from contextlib import asynccontextmanager
 import os
+import uuid
 from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException
@@ -14,7 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 # Import existing Python core functionality without rewriting business logic
-from scheme_matcher import match_schemes
+from scheme_matcher import match_schemes, SchemeAgent
 from financial_calculator import (
     load_schemes,
     get_scheme_details,
@@ -115,6 +116,13 @@ class SchemeMatchRequest(BaseModel):
     )
 
 
+class SchemeChatRequest(BaseModel):
+    session_id: Optional[str] = Field(None, description="Optional session ID for chat continuity")
+    message: str = Field(..., description="User question for the scheme advisor AI")
+    user_data: Optional[Dict[str, Any]] = Field(None, description="Applicant profile dictionary")
+    scheme_ids: Optional[List[str]] = Field(None, description="List of recommended scheme IDs")
+
+
 class EmiCalculatorRequest(BaseModel):
     scheme_id: str = Field(
         ..., json_schema_extra={"example": "MFS"}, description="Selected government scheme ID"
@@ -138,15 +146,18 @@ class EmiCalculatorRequest(BaseModel):
 
 
 class PartnerLocateRequest(BaseModel):
-    scheme_id: str = Field(
-        ..., json_schema_extra={"example": "MFS"}, description="Selected government scheme ID"
-    )
+    scheme_id: Optional[str] = Field(None, json_schema_extra={"example": "MFS"}, description="Single scheme ID")
+    scheme_ids: Optional[List[str]] = Field(None, description="List of target recommended scheme IDs")
     latitude: float = Field(
         ..., ge=-90.0, le=90.0, json_schema_extra={"example": 28.6139}, description="Applicant latitude"
     )
     longitude: float = Field(
         ..., ge=-180.0, le=180.0, json_schema_extra={"example": 77.2090}, description="Applicant longitude"
     )
+
+
+# In-memory store for active SchemeAgent chatbot sessions
+agent_sessions: Dict[str, SchemeAgent] = {}
 
 
 # =============================================================================
@@ -179,6 +190,108 @@ def match_schemes_endpoint(request: SchemeMatchRequest):
         "recommendations": recommendations,
         "total_eligible": total_eligible,
     }
+
+
+@app.post(
+    "/schemes/chat",
+    summary="AI Scheme Advisor Chatbot",
+    description="Exposes LangChain + Gemini SchemeAgent to answer follow-up questions about recommended schemes.",
+    tags=["Scheme Matcher"],
+)
+def chat_schemes_endpoint(request: SchemeChatRequest):
+    """
+    Exposes existing scheme_matcher.SchemeAgent chatbot functionality.
+    """
+    session_id = request.session_id or str(uuid.uuid4())
+    schemes = fetch_schemes()
+
+    if session_id not in agent_sessions:
+        top_schemes = []
+        if request.scheme_ids:
+            target_ids = [sid.lower() for sid in request.scheme_ids]
+            # Match top scheme dicts from schemes.json or run matcher
+            raw_matches = [s for s in schemes if s.get("scheme_id", "").lower() in target_ids]
+            if raw_matches and request.user_data:
+                recs, _ = match_schemes(request.user_data, raw_matches)
+                top_schemes = recs
+            elif raw_matches:
+                top_schemes = raw_matches
+
+        if not top_schemes and request.user_data:
+            recs, _ = match_schemes(request.user_data, schemes)
+            top_schemes = recs
+
+        user_info = request.user_data or {}
+        agent_sessions[session_id] = SchemeAgent(
+            user_data=user_info,
+            top_3_schemes=top_schemes,
+            session_id=session_id,
+        )
+
+    agent = agent_sessions[session_id]
+    response_text = agent.ask(request.message)
+
+    return {
+        "session_id": session_id,
+        "response": response_text,
+    }
+
+
+@app.get(
+    "/schemes",
+    summary="List and Filter All Schemes",
+    description="Returns available government schemes with optional name search and category filtering for the calculator.",
+    tags=["Financial Calculator"],
+)
+def list_schemes_endpoint(
+    search: Optional[str] = None,
+    category: Optional[str] = None,
+    purpose: Optional[str] = None,
+):
+    """
+    Returns scheme summary items from schemes.json for complete catalog browsing & filtering.
+    """
+    schemes = fetch_schemes()
+    filtered = schemes
+
+    if search:
+        q = search.lower()
+        filtered = [
+            s for s in filtered
+            if q in s.get("name", "").lower() or q in s.get("description", "").lower() or q in s.get("scheme_id", "").lower()
+        ]
+
+    if category:
+        cat_q = category.lower()
+        filtered = [
+            s for s in filtered
+            if not s.get("eligibility", {}).get("categories") or
+            any(c.lower() == cat_q for c in s.get("eligibility", {}).get("categories", []))
+        ]
+
+    if purpose:
+        p_q = purpose.lower()
+        filtered = [
+            s for s in filtered
+            if any(p.lower() == p_q for p in s.get("purpose", []))
+        ]
+
+    result = []
+    for s in filtered:
+        details = get_scheme_details(s)
+        result.append({
+            "scheme_id": details["scheme_id"],
+            "name": details["name"],
+            "max_amount": details["max_amount"],
+            "interest_rate": details["interest_rate"],
+            "interest_rate_str": details["interest_rate_str"],
+            "max_tenure": details["max_tenure"],
+            "max_moratorium": details["max_moratorium"],
+            "categories": s.get("eligibility", {}).get("categories", []),
+            "purpose": s.get("purpose", []),
+        })
+
+    return {"schemes": result, "total": len(result)}
 
 
 @app.post(
@@ -261,12 +374,17 @@ def calculate_emi_endpoint(request: EmiCalculatorRequest):
 )
 def locate_partners_endpoint(request: PartnerLocateRequest):
     """
-    Exposes existing partner_locator.get_top_partners function.
+    Exposes existing partner_locator.get_top_partners function for single or multi-scheme lookup.
     """
     partners = load_partners()
 
+    target_scheme_ids = request.scheme_ids or ([request.scheme_id] if request.scheme_id else [])
+
+    if not target_scheme_ids:
+        raise HTTPException(status_code=400, detail="Must provide scheme_id or scheme_ids.")
+
     top_partners = get_top_partners(
-        request.scheme_id,
+        target_scheme_ids if len(target_scheme_ids) > 1 else target_scheme_ids[0],
         request.latitude,
         request.longitude,
         partners,
@@ -278,14 +396,8 @@ def locate_partners_endpoint(request: PartnerLocateRequest):
             "message": "No eligible channel partner found.",
         }
 
-    # Clean internal score fields (_routing_score, _distance_km) from public response
-    clean_partners = [
-        {k: v for k, v in partner.items() if not k.startswith("_")}
-        for partner in top_partners
-    ]
-
     return {
-        "partners": clean_partners,
+        "partners": top_partners,
     }
 
 

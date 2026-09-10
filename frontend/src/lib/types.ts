@@ -59,3 +59,62 @@ export interface RankedPartner extends Partner {
   _routing_score: number;
   _distance_km: number;
 }
+
+// FastAPI Response for POST /schemes/match
+export interface SchemeMatchResponse {
+  recommendations: SchemeRecommendation[];
+  total_eligible: number;
+  message?: string;
+}
+
+// FastAPI Request for POST /calculator/emi
+export interface EmiCalculatorRequest {
+  scheme_id: string;
+  loan_amount: number;
+  interest_rate?: number;
+  tenure_months: number;
+  moratorium_months: number;
+}
+
+// Summary object returned inside EmiCalculatorResponse
+export interface EmiSummary {
+  loan_amount: number;
+  tenure_months: number;
+  moratorium_months: number;
+  monthly_emi: number;
+  total_interest: number;
+  total_repayment: number;
+}
+
+// Amortization row returned in amortization_schedule
+export interface AmortizationRow {
+  month: number;
+  phase: string;
+  opening: number;
+  payment: number;
+  interest: number;
+  principal: number;
+  closing: number;
+}
+
+// FastAPI Response for POST /calculator/emi
+export interface EmiCalculatorResponse {
+  scheme_id: string;
+  scheme_name: string;
+  interest_rate_used: number;
+  summary: EmiSummary;
+  amortization_schedule: AmortizationRow[];
+}
+
+// FastAPI Request for POST /partners/locate
+export interface PartnerLocateRequest {
+  scheme_id: string;
+  latitude: number;
+  longitude: number;
+}
+
+// FastAPI Response for POST /partners/locate
+export interface PartnerLocateResponse {
+  partners: RankedPartner[];
+  message?: string;
+}

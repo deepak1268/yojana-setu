@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Topbar } from "@/components/dashboard/Topbar";
-import { sampleRecommendations } from "@/lib/mock-data";
 import type { SchemeRecommendation } from "@/lib/types";
 
 const actions = [
@@ -24,13 +23,11 @@ export default function DashboardOverview() {
         if (parsed.length) {
           setTop(parsed[0]);
           setHasRun(true);
-          return;
         }
       } catch {
-        // fall through to sample data
+        // Ignore invalid storage
       }
     }
-    setTop(sampleRecommendations[0]);
   }, []);
 
   return (
@@ -40,9 +37,9 @@ export default function DashboardOverview() {
       <div className="flex-1 space-y-8 px-5 py-6 sm:px-8 sm:py-8">
         {!hasRun && (
           <div className="rounded-2xl border border-saffron-deep/20 bg-saffron/10 px-5 py-4 text-sm text-saffron-deep">
-            You haven&apos;t run the scheme recommender yet — the numbers below are a sample.{" "}
+            You haven&apos;t run the scheme recommender yet.{" "}
             <Link href="/dashboard/recommender" className="font-semibold underline">
-              Run it now
+              Run scheme match now
             </Link>
           </div>
         )}

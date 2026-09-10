@@ -1,77 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Topbar } from "@/components/dashboard/Topbar";
-import { samplePartners, sampleRecommendations } from "@/lib/mock-data";
-import type { Partner, RankedPartner, SchemeRecommendation } from "@/lib/types";
-
-// Mirrors ai/partner_locator.py's thresholds and weights so ranking behaves
-// the same way once real data/backend replaces the sample dataset.
-const MAX_FUND_UTILIZATION = 85.0;
-const MAX_NPA = 7.0;
-const MAX_OVERDUE = 10.0;
-const WEIGHT_FUND = 0.25;
-const WEIGHT_NPA = 0.15;
-const WEIGHT_OVERDUE = 0.1;
-const WEIGHT_CAPACITY = 0.1;
-const WEIGHT_DISTANCE = 0.4;
-
-function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
-  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
-}
-
-function isEligible(p: Partner, schemeId: string) {
-  return (
-    p.active &&
-    p.supported_schemes.includes(schemeId) &&
-    p.fund_utilization_percent < MAX_FUND_UTILIZATION &&
-    p.npa_percent < MAX_NPA &&
-    p.overdue_percent < MAX_OVERDUE
-  );
-}
-
-function capacityScore(c: Partner["processing_capacity"]) {
-  return c === "high" ? 1 : c === "medium" ? 0.6 : 0.3;
-}
-
-function rankPartners(partners: Partner[], userLat: number, userLon: number): RankedPartner[] {
-  const withDistance = partners.map((p) => ({
-    partner: p,
-    distance: haversineKm(userLat, userLon, p.latitude, p.longitude),
-  }));
-  const distances = withDistance.map((d) => d.distance);
-  const min = Math.min(...distances);
-  const max = Math.max(...distances);
-
-  return withDistance
-    .map(({ partner, distance }) => {
-      const distScore = max === min ? 1 : 1 - (distance - min) / (max - min);
-      const fundScore = Math.max(0, 1 - partner.fund_utilization_percent / MAX_FUND_UTILIZATION);
-      const npaScore = Math.max(0, 1 - partner.npa_percent / MAX_NPA);
-      const overdueScore = Math.max(0, 1 - partner.overdue_percent / MAX_OVERDUE);
-      const capScore = capacityScore(partner.processing_capacity);
-      const score =
-        distScore * WEIGHT_DISTANCE +
-        fundScore * WEIGHT_FUND +
-        npaScore * WEIGHT_NPA +
-        overdueScore * WEIGHT_OVERDUE +
-        capScore * WEIGHT_CAPACITY;
-      return { ...partner, _routing_score: score, _distance_km: distance };
-    })
-    .sort((a, b) => b._routing_score - a._routing_score);
-}
+import { fetchLocatedPartners } from "@/lib/api";
+import type { RankedPartner, SchemeRecommendation } from "@/lib/types";
 
 const partnerTypes = ["All", "SCA", "PSB", "RRB", "NBFC-MFI"] as const;
 
 export default function LocatorPage() {
-  const [recommendations, setRecommendations] = useState<SchemeRecommendation[]>(sampleRecommendations);
+  const [recommendations, setRecommendations] = useState<SchemeRecommendation[]>([]);
+  const [partners, setPartners] = useState<RankedPartner[]>([]);
   const [filter, setFilter] = useState<(typeof partnerTypes)[number]>("All");
+  const [lat, setLat] = useState<number>(28.6139);
+  const [lon, setLon] = useState<number>(77.2090);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const stored = window.localStorage.getItem("ys_last_recommendations");
@@ -80,27 +23,75 @@ export default function LocatorPage() {
         const parsed = JSON.parse(stored) as SchemeRecommendation[];
         if (parsed.length) setRecommendations(parsed);
       } catch {
-        // fall back to sample data
+        // Ignore invalid storage
       }
+    }
+
+    if (typeof window !== "undefined" && "geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setLat(pos.coords.latitude);
+          setLon(pos.coords.longitude);
+        },
+        () => {
+          // Fallback to default coordinates if permission denied
+        }
+      );
     }
   }, []);
 
-  const schemeId = recommendations[0]?.scheme_id ?? "";
-  // Sample user location — swap for browser geolocation once wired to a backend.
-  const userLat = 28.6139;
-  const userLon = 77.209;
+  const scheme = recommendations[0];
 
-  const ranked = useMemo(() => {
-    const eligible = samplePartners.filter((p) => isEligible(p, schemeId));
-    const top = rankPartners(eligible, userLat, userLon);
-    return filter === "All" ? top : top.filter((p) => p.type === filter);
-  }, [schemeId, filter]);
+  useEffect(() => {
+    if (!scheme) return;
+    let isCancelled = false;
+    setLoading(true);
+    setError(null);
+
+    fetchLocatedPartners({
+      scheme_id: scheme.scheme_id,
+      latitude: lat,
+      longitude: lon,
+    })
+      .then((data) => {
+        if (!isCancelled) {
+          setPartners(data.partners || []);
+        }
+      })
+      .catch((err) => {
+        if (!isCancelled) {
+          setError(err instanceof Error ? err.message : "Failed to locate channel partners.");
+        }
+      })
+      .finally(() => {
+        if (!isCancelled) setLoading(false);
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [scheme, lat, lon]);
+
+  if (!scheme) {
+    return (
+      <>
+        <Topbar title="Partner locator" subtitle="Eligible channel partners near you." />
+        <div className="flex-1 px-5 py-6 sm:px-8 sm:py-8">
+          <div className="rounded-3xl border border-dashed border-navy/15 p-8 text-center text-sm text-muted">
+            Please run the scheme recommender first to find matched schemes and locate nearby channel partners.
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  const filteredPartners = filter === "All" ? partners : partners.filter((p) => p.type === filter);
 
   return (
     <>
       <Topbar
         title="Partner locator"
-        subtitle={`Eligible partners for ${recommendations[0]?.scheme_name ?? "your matched scheme"}.`}
+        subtitle={`Eligible partners for ${scheme.scheme_name}.`}
       />
 
       <div className="flex-1 px-5 py-6 sm:px-8 sm:py-8">
@@ -119,19 +110,29 @@ export default function LocatorPage() {
           ))}
         </div>
 
+        {error && (
+          <div className="mt-6 rounded-3xl border border-red-500/20 bg-red-500/10 p-6 text-sm text-red-600">
+            {error}
+          </div>
+        )}
+
         <div className="mt-6 overflow-hidden rounded-3xl border border-navy/10 bg-card">
-          {ranked.length === 0 ? (
+          {loading ? (
             <p className="px-6 py-8 text-center text-sm text-muted">
-              No eligible channel partner found for this scheme yet — the sample dataset only covers Delhi.
+              Searching and ranking channel partners near your location...
+            </p>
+          ) : filteredPartners.length === 0 ? (
+            <p className="px-6 py-8 text-center text-sm text-muted">
+              No eligible channel partner found for this scheme near your location ({lat.toFixed(2)}, {lon.toFixed(2)}).
             </p>
           ) : (
             <ul className="divide-y divide-navy/10">
-              {ranked.map((p) => (
+              {filteredPartners.map((p) => (
                 <li key={p.partner_id} className="flex items-center justify-between gap-3 px-6 py-4">
                   <div>
                     <p className="text-sm font-semibold text-ink">{p.name}</p>
                     <p className="text-xs text-muted">
-                      {p.type} · {p.city}, {p.state} · {p._distance_km.toFixed(1)} km
+                      {p.type} · {p.city}, {p.state} · {(p._distance_km ?? 0).toFixed(1)} km
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
@@ -139,7 +140,7 @@ export default function LocatorPage() {
                       Utilisation {p.fund_utilization_percent}%
                     </span>
                     <span className="rounded-full bg-navy/8 px-2.5 py-1 text-[11px] font-semibold text-ink">
-                      Score {(p._routing_score * 100).toFixed(0)}
+                      Score {((p._routing_score ?? 0) * 100).toFixed(0)}
                     </span>
                   </div>
                 </li>

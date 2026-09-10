@@ -1,20 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Topbar } from "@/components/dashboard/Topbar";
-import { sampleRecommendations } from "@/lib/mock-data";
-import type { SchemeRecommendation } from "@/lib/types";
+import { fetchEmiCalculation } from "@/lib/api";
+import type { EmiCalculatorResponse, SchemeRecommendation } from "@/lib/types";
 
 function formatInr(n: number) {
   return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(n);
-}
-
-// financial_details values come from ai/scheme_matcher.py as display strings
-// (e.g. "6.5% - 8%", "84 months") — parse them back into numbers for the calculator.
-function parseRate(rate?: string): number {
-  if (!rate) return 8;
-  const nums = rate.match(/[\d.]+/g)?.map(Number) ?? [8];
-  return nums.length > 1 ? (nums[0] + nums[1]) / 2 : nums[0];
 }
 
 function parseMonths(text?: string): number {
@@ -30,10 +22,14 @@ function parseMaxLoan(text?: string): number {
 }
 
 export default function CalculatorPage() {
-  const [recommendations, setRecommendations] = useState<SchemeRecommendation[]>(sampleRecommendations);
+  const [recommendations, setRecommendations] = useState<SchemeRecommendation[]>([]);
   const [schemeIndex, setSchemeIndex] = useState(0);
-  const [amount, setAmount] = useState(450000);
+  const [amount, setAmount] = useState(90000);
   const [months, setMonths] = useState(60);
+  const [moratorium, setMoratorium] = useState(0);
+  const [emiResult, setEmiResult] = useState<EmiCalculatorResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const stored = window.localStorage.getItem("ys_last_recommendations");
@@ -42,31 +38,57 @@ export default function CalculatorPage() {
         const parsed = JSON.parse(stored) as SchemeRecommendation[];
         if (parsed.length) setRecommendations(parsed);
       } catch {
-        // fall back to sample data
+        // Ignore invalid storage
       }
     }
   }, []);
 
   const scheme = recommendations[schemeIndex];
-  const rate = parseRate(scheme.financial_details.interest_rate) / 100;
-  const maxTenure = parseMonths(scheme.financial_details.max_tenure);
-  const maxLoan = parseMaxLoan(scheme.financial_details.max_loan);
-  const cappedAmount = Math.min(amount, maxLoan);
+  const maxTenure = scheme ? parseMonths(scheme.financial_details.max_tenure) : 60;
+  const maxLoan = scheme ? parseMaxLoan(scheme.financial_details.max_loan) : 500000;
 
-  const { emi, totalInterest, schedule } = useMemo(() => {
-    const r = rate / 12;
-    const n = Math.min(months, maxTenure) || 1;
-    const monthlyEmi = r === 0 ? cappedAmount / n : (cappedAmount * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-    let balance = cappedAmount;
-    const rows: { month: number; principal: number; interest: number; balance: number }[] = [];
-    for (let m = 1; m <= Math.min(n, 6); m++) {
-      const interest = balance * r;
-      const principal = monthlyEmi - interest;
-      balance = Math.max(balance - principal, 0);
-      rows.push({ month: m, principal, interest, balance });
-    }
-    return { emi: monthlyEmi, totalInterest: monthlyEmi * n - cappedAmount, schedule: rows };
-  }, [cappedAmount, months, maxTenure, rate]);
+  useEffect(() => {
+    if (!scheme) return;
+    let isCancelled = false;
+    setLoading(true);
+    setError(null);
+
+    const moratoriumMonths = parseMonths(scheme.financial_details.moratorium) || 0;
+    setMoratorium(moratoriumMonths);
+
+    fetchEmiCalculation({
+      scheme_id: scheme.scheme_id,
+      loan_amount: Math.min(amount, maxLoan),
+      tenure_months: Math.min(months, maxTenure) || 12,
+      moratorium_months: moratoriumMonths,
+    })
+      .then((data) => {
+        if (!isCancelled) setEmiResult(data);
+      })
+      .catch((err) => {
+        if (!isCancelled) setError(err instanceof Error ? err.message : "Calculation failed.");
+      })
+      .finally(() => {
+        if (!isCancelled) setLoading(false);
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [scheme, amount, months, maxLoan, maxTenure]);
+
+  if (!scheme) {
+    return (
+      <>
+        <Topbar title="EMI calculator" subtitle="Based on the scheme you were matched with." />
+        <div className="flex-1 px-5 py-6 sm:px-8 sm:py-8">
+          <div className="rounded-3xl border border-dashed border-navy/15 p-8 text-center text-sm text-muted">
+            Please run the scheme recommender first to populate matched schemes for calculation.
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -100,7 +122,7 @@ export default function CalculatorPage() {
                 min={20000}
                 max={maxLoan}
                 step={5000}
-                value={amount}
+                value={Math.min(amount, maxLoan)}
                 onChange={(e) => setAmount(Number(e.target.value))}
                 className="mt-3 w-full accent-saffron"
               />
@@ -120,30 +142,42 @@ export default function CalculatorPage() {
             </label>
 
             <p className="mt-5 text-xs text-muted">
-              Moratorium: {scheme.financial_details.moratorium ?? "as per scheme"} · Rate used: {(rate * 100).toFixed(1)}%
+              Moratorium: {scheme.financial_details.moratorium ?? "as per scheme"} · Rate used: {emiResult ? `${emiResult.interest_rate_used}%` : scheme.financial_details.interest_rate ?? "—"}
             </p>
           </div>
 
           <div className="space-y-5">
+            {error && (
+              <div className="rounded-3xl border border-red-500/20 bg-red-500/10 p-6 text-sm text-red-600">
+                {error}
+              </div>
+            )}
+
             <div className="rounded-3xl bg-navy p-6 text-cream sm:p-7">
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <p className="text-xs text-cream/60">Monthly EMI</p>
-                  <p className="mt-1 font-display text-2xl">{formatInr(emi)}</p>
+                  <p className="mt-1 font-display text-2xl">
+                    {loading ? "..." : emiResult ? formatInr(emiResult.summary.monthly_emi) : "—"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-xs text-cream/60">Total interest</p>
-                  <p className="mt-1 font-display text-2xl">{formatInr(totalInterest)}</p>
+                  <p className="mt-1 font-display text-2xl">
+                    {loading ? "..." : emiResult ? formatInr(emiResult.summary.total_interest) : "—"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-xs text-cream/60">Rate</p>
-                  <p className="mt-1 font-display text-2xl">{(rate * 100).toFixed(1)}%</p>
+                  <p className="mt-1 font-display text-2xl">
+                    {emiResult ? `${emiResult.interest_rate_used}%` : "—"}
+                  </p>
                 </div>
               </div>
             </div>
 
             <div className="rounded-3xl border border-navy/10 bg-card p-6 sm:p-7">
-              <p className="text-sm font-semibold text-ink">First 6 months</p>
+              <p className="text-sm font-semibold text-ink">First 6 months schedule</p>
               <table className="mt-4 w-full text-left text-sm">
                 <thead>
                   <tr className="text-xs text-muted">
@@ -154,12 +188,14 @@ export default function CalculatorPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-navy/8">
-                  {schedule.map((row) => (
+                  {emiResult?.amortization_schedule.slice(0, 6).map((row) => (
                     <tr key={row.month}>
-                      <td className="py-2 text-ink">{row.month}</td>
+                      <td className="py-2 text-ink">
+                        {row.month} {row.phase === "Moratorium" ? "(Mor)" : ""}
+                      </td>
                       <td className="py-2 text-ink">{formatInr(row.principal)}</td>
                       <td className="py-2 text-muted">{formatInr(row.interest)}</td>
-                      <td className="py-2 text-muted">{formatInr(row.balance)}</td>
+                      <td className="py-2 text-muted">{formatInr(row.closing)}</td>
                     </tr>
                   ))}
                 </tbody>
