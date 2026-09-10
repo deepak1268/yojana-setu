@@ -13,10 +13,10 @@ Based on these inputs, Yojana Setu recommends the **top 3 relevant schemes** and
 ## 1. Project Information
 
 - **Project Title:** Yojana Setu – AI-Driven Scheme Matching
-- **PS ID:** SIH2026
-- **PS Title:** AI-Driven Scheme Matching for SC Beneficiaries
+- **PS ID:** 26092
+- **PS Title:** AI-Driven Scheme matching for Marginalized Entrepreneurs
 - **Category:** Software
-- **Theme:** Financial Inclusion
+- **Theme:** Smart Automation 
 
 ---
 
