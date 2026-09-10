@@ -41,7 +41,7 @@ export default function signup() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/auth/google",
+        "http://localhost:3000/api/auth/google",
         {
           credential: response.credential,
         }
@@ -56,9 +56,7 @@ export default function signup() {
       toast.success("Welcome! You're signed in successfully.");
 
       console.log("Google signup successful:", user);
-
-      // Redirect later
-      // window.location.href = "/dashboard";
+      window.location.href = "/dashboard";
     } catch (error) {
       if (axios.isAxiosError(error)) {
         toast.error(
@@ -92,7 +90,7 @@ export default function signup() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/signup",
+        "http://localhost:3000/api/auth/signup",
         {
           name,
           email,

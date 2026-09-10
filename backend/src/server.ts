@@ -7,9 +7,12 @@ import authRouter from "./routes/authRoutes";
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:3001",
+    credentials: true
+}));
 app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Backend is working");
@@ -18,6 +21,6 @@ app.use("/api/auth",authRouter);
 
 connectDB().then(() => {
     app.listen(port,() => {
-        console.log(`Server is up and running.`);
+        console.log(`Server is up and running on ${port}`);
     });
 });

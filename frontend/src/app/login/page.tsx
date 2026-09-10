@@ -45,7 +45,7 @@ export default function login() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/auth/google",
+        "http://localhost:3000/api/auth/google",
         {
           credential: response.credential,
         }
@@ -60,11 +60,10 @@ export default function login() {
       toast.success("Welcome! You're signed in successfully.!");
 
       console.log("Google signup successful:", user);
-
-      // Redirect later
-      // window.location.href = "/dashboard";
+      window.location.href = "/dashboard";
     } catch (error) {
       if (axios.isAxiosError(error)) {
+        console.error(error);
         toast.error(
           error.response?.data?.message ||
           "Google authentication failed. Please try again."
@@ -90,7 +89,7 @@ export default function login() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        "http://localhost:3000/api/auth/login",
         {
           email,
           password,
