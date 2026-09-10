@@ -1,0 +1,96 @@
+import type { SchemeRecommendation, Partner } from "./types";
+
+// A handful of sample recommendations shaped exactly like match_schemes() output,
+// so the recommender/calculator UI can be built against the real schema.
+export const sampleRecommendations: SchemeRecommendation[] = [
+  {
+    rank: 1,
+    scheme_id: "NSFDC_TERM_LOAN_SCHEME",
+    scheme_name: "NSFDC Term Loan Scheme",
+    match_score: 92,
+    eligibility_status: "eligible",
+    matched_rules: [
+      "Category: Applicant belongs to Scheduled Caste (SC) as required by NSFDC",
+      "Annual income within the concessional limit of ₹5,00,000",
+    ],
+    warnings: [],
+    financial_details: {
+      max_loan: "Rs. 5,000,000",
+      percentage_financed: "90%",
+      interest_rate: "6.5% - 8%",
+      max_tenure: "84 months",
+      moratorium: "6 months",
+    },
+    documents: ["caste certificate", "income certificate", "project report"],
+    source: { name: "NSFDC", url: "" },
+  },
+  {
+    rank: 2,
+    scheme_id: "NSFDC_MICRO_FINANCE_SCHEME",
+    scheme_name: "NSFDC Micro Finance Scheme",
+    match_score: 78,
+    eligibility_status: "eligible",
+    matched_rules: [
+      "Category: Applicant belongs to Scheduled Caste (SC) as required by NSFDC",
+    ],
+    warnings: ["Project cost close to the micro finance ceiling"],
+    financial_details: {
+      max_loan: "Rs. 140,000",
+      percentage_financed: "90%",
+      interest_rate: "6.5%",
+      max_tenure: "36 months",
+      moratorium: "3 months",
+    },
+    documents: ["caste certificate", "income certificate"],
+    source: { name: "NSFDC", url: "" },
+  },
+];
+
+// A handful of sample partners shaped exactly like ai/partners.json entries.
+export const samplePartners: Partner[] = [
+  {
+    partner_id: "P001",
+    name: "Delhi State Channelizing Agency",
+    type: "SCA",
+    state: "Delhi",
+    city: "New Delhi",
+    latitude: 28.5664,
+    longitude: 77.1865,
+    supported_schemes: ["NSFDC_TERM_LOAN_SCHEME", "NSFDC_MICRO_FINANCE_SCHEME"],
+    active: true,
+    fund_utilization_percent: 70.7,
+    npa_percent: 1.5,
+    overdue_percent: 4.4,
+    processing_capacity: "medium",
+  },
+  {
+    partner_id: "P002",
+    name: "State Bank Partner - New Delhi",
+    type: "PSB",
+    state: "Delhi",
+    city: "New Delhi",
+    latitude: 28.6139,
+    longitude: 77.209,
+    supported_schemes: ["NSFDC_TERM_LOAN_SCHEME"],
+    active: true,
+    fund_utilization_percent: 62.1,
+    npa_percent: 2.8,
+    overdue_percent: 3.1,
+    processing_capacity: "high",
+  },
+  {
+    partner_id: "P003",
+    name: "Gramin Microfinance Partner - New Delhi",
+    type: "NBFC-MFI",
+    state: "Delhi",
+    city: "New Delhi",
+    latitude: 28.55,
+    longitude: 77.18,
+    supported_schemes: ["NSFDC_MICRO_FINANCE_SCHEME"],
+    active: true,
+    fund_utilization_percent: 88.4,
+    npa_percent: 5.2,
+    overdue_percent: 9.8,
+    processing_capacity: "low",
+  },
+];
