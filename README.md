@@ -135,7 +135,7 @@ Users can ask questions such as:
 - Node.js
 - Express.js
 - TypeScript
-- REST APIs
+- FAST API
 
 ### Database
 
@@ -235,8 +235,6 @@ YOJANA-SETU/
 │
 ├── ai/
 │
-├── docs/
-│
 ├── assets/
 │   └── screenshots/
 │
@@ -262,35 +260,30 @@ YOJANA-SETU/
 
 ## 8. Final Presentation
 
-The final SIH 2026 presentation is available in the `submissions/` folder.
+The final SIH 2026 presentation is included in the repository.
 
-**Presentation:** `submissions/PRESENTATION.pdf`
-
----
+- 📊 [View Final Presentation](submission/NIRMAN_SIH_2026_PPT.pptx)
+- 📄 [Presentation Details](submission/PRESENTATION.md)
 
 ## 9. Demo Video
 
-The project demonstration video is available in the `submissions/` folder.
+A demonstration video of the project is available in the submission folder.
 
-**Demo Video:** `submissions/DEMO.mp4`
+- 🎥 [View Demo Video](submission/DEMO.md)
 
 ---
 
-## 10. Screenshots / Prototype Photos
+# 10. Screenshots / Prototype Photos
 
-Important screenshots and prototype photos of Yojana Setu are available in the `submissions/` folder.
+Important screenshots and prototype images of **Yojana Setu** are available in the `assets/screenshots/` folder.
 
-The screenshots include:
+### Screenshots
 
-- Landing page
-- Login / Signup
-- User details form
-- Scheme recommendations
-- Scheme details
-- AI chatbot
-- EMI calculator
-- Bank / Channel Partner locator
-- Map and navigation
+- 🏠 [Landing Page](assets/screenshots/LANDING%20PAGE.png)
+- 📋 [Scheme Recommendations](assets/screenshots/SCHEME%20RECOMMENDER.png)
+- 🤖 [AI Chatbot](assets/screenshots/AI%20CHATBOT.png)
+- 🧮 [EMI Calculator](assets/screenshots/FINANCIAL%20CALCULATOR.png)
+- 🏦 [Bank / Channel Partner Locator](assets/screenshots/PARTNER%20LOCATOR.png)
 
 ---
 
