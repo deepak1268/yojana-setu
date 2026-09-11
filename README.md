@@ -262,14 +262,14 @@ YOJANA-SETU/
 
 The final SIH 2026 presentation is included in the repository.
 
-- 📊 [View Final Presentation](submission/NIRMAN_SIH_2026_PPT.pptx)
-- 📄 [Presentation Details](submission/PRESENTATION.md)
+
+- 📄 [Presentation Details](submission/PRESENTATION.MD)
 
 ## 9. Demo Video
 
 A demonstration video of the project is available in the submission folder.
 
-- 🎥 [View Demo Video](submission/DEMO.md)
+- 🎥 [Demo Video Details](submission/DEMO.MD)
 
 ---
 
