@@ -36,11 +36,7 @@ export default function login() {
   const [isPending, startTransition] = useTransition();
   const { setUser, loading, setLoading } = useAuth();
   const googleButtonRef = useRef<HTMLDivElement>(null);
-  console.log(
-    "Google Client ID:",
-    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
-  );
-
+  
   const handleGoogleResponse = async (response: { credential: string }) => {
     setLoading(true);
 
