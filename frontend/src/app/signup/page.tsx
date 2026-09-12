@@ -32,7 +32,7 @@ declare global {
 }
 
 export default function signup() {
-  const { setUser, loading, setLoading } = useAuth();
+  const { login: authLogin, loading, setLoading } = useAuth();
 
   const googleButtonRef = useRef<HTMLDivElement>(null);
 
@@ -50,9 +50,7 @@ export default function signup() {
 
       const { token, user } = res.data;
 
-      localStorage.setItem("token", token);
-
-      setUser(user);
+      authLogin(token, user);
 
       toast.success("Welcome! You're signed in successfully.");
 
@@ -101,18 +99,13 @@ export default function signup() {
 
       const { token, user } = response.data;
 
-      // Store token
-      localStorage.setItem("token", token);
-
-      // Store user in AuthContext
-      setUser(user);
+      authLogin(token, user);
 
       toast.success("Account created successfully!");
 
       console.log("Signup successful:", user);
 
-      // You can redirect after signup
-      // window.location.href = "/dashboard";
+      window.location.href = "/dashboard";
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;

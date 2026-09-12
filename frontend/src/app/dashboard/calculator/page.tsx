@@ -357,20 +357,29 @@ export default function CalculatorPage() {
               <div>
                 <div className="flex justify-between items-center text-sm font-medium text-ink">
                   <span>Repayment Tenure</span>
-                  <span className="font-display text-base text-green">{months} months</span>
+                  <span className="font-display text-base text-green">
+                    {Math.max(minTenure, Math.min(months, maxTenure))} months
+                    {minTenure === maxTenure && " (Fixed)"}
+                    {minTenure !== maxTenure && Math.max(minTenure, Math.min(months, maxTenure)) >= 12 && (
+                      <span className="text-xs text-muted font-normal ml-1">
+                        ({(Math.max(minTenure, Math.min(months, maxTenure)) / 12).toFixed(1)} yrs)
+                      </span>
+                    )}
+                  </span>
                 </div>
                 <input
                   type="range"
                   min={minTenure}
-                  max={maxTenure}
-                  step={6}
-                  value={Math.min(months, maxTenure)}
+                  max={Math.max(minTenure, maxTenure)}
+                  step={1}
+                  disabled={minTenure >= maxTenure}
+                  value={Math.max(minTenure, Math.min(months, maxTenure))}
                   onChange={(e) => setMonths(Number(e.target.value))}
-                  className="mt-3 w-full accent-green"
+                  className="mt-3 w-full accent-green disabled:opacity-40 disabled:cursor-not-allowed"
                 />
                 <div className="flex justify-between text-[11px] text-muted mt-1">
-                  <span>Min: {minTenure} mos</span>
-                  <span>Max: {maxTenure} mos</span>
+                  <span>{minTenure === maxTenure ? `Fixed: ${minTenure} mos` : `Min: ${minTenure} mos`}</span>
+                  <span>{minTenure === maxTenure ? "" : `Max: ${maxTenure} mos`}</span>
                 </div>
               </div>
 

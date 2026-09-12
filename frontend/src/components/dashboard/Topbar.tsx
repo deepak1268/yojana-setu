@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { getUserName, signOut } from "@/lib/auth";
+import { useAuth } from "@/context/AuthContext";
 
 export function Topbar({
   title,
@@ -12,15 +11,11 @@ export function Topbar({
   title: string;
   subtitle?: string;
 }) {
-  const router = useRouter();
-  const [initial, setInitial] = useState("A");
+  const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const name = getUserName();
-    if (name) setInitial(name.charAt(0).toUpperCase());
-  }, []);
+  const initial = user?.name ? user.name.trim().charAt(0).toUpperCase() : "U";
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -33,8 +28,8 @@ export function Topbar({
   }, []);
 
   function handleLogout() {
-    signOut();
-    router.push("/");
+    setOpen(false);
+    logout();
   }
 
   return (
@@ -48,19 +43,25 @@ export function Topbar({
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="flex items-center gap-2.5 rounded-full border border-navy/10 bg-card px-3 py-2 text-sm font-medium text-ink"
+          className="flex items-center gap-2.5 rounded-full border border-navy/10 bg-card px-3 py-2 text-sm font-medium text-ink shadow-xs transition hover:border-navy/20"
         >
-          <span className="grid h-7 w-7 place-items-center rounded-full bg-green/15 text-xs font-semibold text-green">
+          <span className="grid h-7 w-7 place-items-center rounded-full bg-green/15 text-xs font-semibold text-green uppercase">
             {initial}
           </span>
-          My account
+          <span>My account</span>
         </button>
 
         {open && (
-          <div className="absolute right-0 z-10 mt-2 w-44 overflow-hidden rounded-xl border border-navy/10 bg-card shadow-lg">
+          <div className="absolute right-0 z-10 mt-2 w-52 overflow-hidden rounded-2xl border border-navy/10 bg-card p-1.5 shadow-xl">
+            {user && (
+              <div className="border-b border-navy/10 px-3 py-2 mb-1">
+                <p className="text-xs font-semibold text-ink truncate">{user.name}</p>
+                <p className="text-[11px] text-muted truncate">{user.email}</p>
+              </div>
+            )}
             <Link
               href="/"
-              className="block px-4 py-2.5 text-sm text-ink hover:bg-navy/5"
+              className="block rounded-lg px-3 py-2 text-sm text-ink hover:bg-navy/5 transition"
               onClick={() => setOpen(false)}
             >
               Home
@@ -68,7 +69,7 @@ export function Topbar({
             <button
               type="button"
               onClick={handleLogout}
-              className="block w-full px-4 py-2.5 text-left text-sm font-medium text-saffron-deep hover:bg-saffron/10"
+              className="block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-saffron-deep hover:bg-saffron/10 transition"
             >
               Log out
             </button>

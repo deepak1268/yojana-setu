@@ -1,8 +1,9 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
-type User = {
+export type User = {
   id: string;
   name: string;
   email: string;
@@ -14,6 +15,9 @@ type AuthContextType = {
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  initialLoading: boolean;
+  login: (token: string, user: User) => void;
+  logout: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -25,6 +29,40 @@ export const AuthProvider = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const router = useRouter();
+
+  // Restore session from localStorage on mount
+  useEffect(() => {
+    try {
+      const storedToken = localStorage.getItem("token");
+      const storedUser = localStorage.getItem("user");
+      if (storedToken && storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+    } catch (error) {
+      console.error("Error restoring session from localStorage:", error);
+    } finally {
+      setInitialLoading(false);
+    }
+  }, []);
+
+  const login = (token: string, userData: User) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem("ys_authed", "true");
+    localStorage.setItem("ys_name", userData.name);
+    setUser(userData);
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("ys_authed");
+    localStorage.removeItem("ys_name");
+    setUser(null);
+    router.push("/");
+  };
 
   return (
     <AuthContext.Provider
@@ -33,6 +71,9 @@ export const AuthProvider = ({
         setUser,
         loading,
         setLoading,
+        initialLoading,
+        login,
+        logout,
       }}
     >
       {children}

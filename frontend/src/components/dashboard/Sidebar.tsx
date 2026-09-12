@@ -8,7 +8,6 @@ const links = [
   { href: "/dashboard/recommender", label: "Scheme recommender", icon: "compass" },
   { href: "/dashboard/calculator", label: "EMI calculator", icon: "calc" },
   { href: "/dashboard/locator", label: "Partner locator", icon: "pin" },
-  { href: "/dashboard/applications", label: "Applications", icon: "doc" },
 ] as const;
 
 function Icon({ name }: { name: (typeof links)[number]["icon"] }) {
@@ -42,13 +41,6 @@ function Icon({ name }: { name: (typeof links)[number]["icon"] }) {
         <svg {...common}>
           <path d="M12 21s7-6.4 7-11.5A7 7 0 0 0 5 9.5C5 14.6 12 21 12 21Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
           <circle cx="12" cy="9.5" r="2.3" stroke="currentColor" strokeWidth="1.6" />
-        </svg>
-      );
-    case "doc":
-      return (
-        <svg {...common}>
-          <path d="M7 3.5h7l3 3V20a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-          <path d="M9 12h6M9 15.5h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
       );
   }
