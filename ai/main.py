@@ -6,15 +6,17 @@ via REST API endpoints while strictly preserving underlying business logic.
 """
 
 from contextlib import asynccontextmanager
+import json
 import os
 from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 # Import existing Python core functionality without rewriting business logic
-from scheme_matcher import match_schemes
+from scheme_matcher import match_schemes, SchemeAgent
 from financial_calculator import (
     load_schemes,
     get_scheme_details,
@@ -149,6 +151,21 @@ class PartnerLocateRequest(BaseModel):
     )
 
 
+class SchemeChatRequest(BaseModel):
+    message: str = Field(
+        ..., json_schema_extra={"example": "Explain the top recommended schemes for me"}, description="User query or message"
+    )
+    session_id: Optional[str] = Field(
+        "default_session", json_schema_extra={"example": "session-123"}, description="Conversation session ID"
+    )
+    user_data: Optional[Dict[str, Any]] = Field(
+        None, description="Optional applicant profile dictionary"
+    )
+    top_3_schemes: Optional[List[Dict[str, Any]]] = Field(
+        None, description="Optional pre-calculated top recommended schemes list"
+    )
+
+
 # =============================================================================
 # API ENDPOINTS
 # =============================================================================
@@ -179,6 +196,56 @@ def match_schemes_endpoint(request: SchemeMatchRequest):
         "recommendations": recommendations,
         "total_eligible": total_eligible,
     }
+
+
+@app.post(
+    "/schemes/chat",
+    summary="Chat with AI Scheme Advisor (Streaming)",
+    description="Streams responses chunk-by-chunk from the AI SchemeAgent.",
+    tags=["Scheme Advisor"],
+)
+async def chat_schemes_endpoint(request: SchemeChatRequest):
+    """
+    Forwards user message to SchemeAgent and streams generated chunks progressively using SSE.
+    """
+    user_data = request.user_data or {
+        "category": "SC",
+        "gender": "male",
+        "age": 25,
+        "annual_income": 300000.0,
+        "state": "Delhi",
+        "district": "New Delhi",
+        "occupation": "self_employed",
+        "education": "graduate",
+        "purpose": "business",
+        "project_type": "micro_business",
+        "project_cost": 100000.0,
+        "loan_required": 90000.0,
+    }
+    top_3_schemes = request.top_3_schemes
+    if not top_3_schemes:
+        schemes = fetch_schemes()
+        top_3_schemes, _ = match_schemes(user_data, schemes)
+
+    session_id = request.session_id or "default_session"
+    agent = SchemeAgent(
+        user_data=user_data,
+        top_3_schemes=top_3_schemes,
+        session_id=session_id,
+    )
+
+    async def event_generator():
+        try:
+            async for chunk in agent.astream(request.message):
+                if chunk:
+                    payload = json.dumps({"content": chunk})
+                    yield f"data: {payload}\n\n"
+            yield "data: [DONE]\n\n"
+        except Exception as e:
+            err_payload = json.dumps({"error": str(e)})
+            yield f"data: {err_payload}\n\n"
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 
 @app.post(

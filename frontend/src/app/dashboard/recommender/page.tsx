@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { sampleRecommendations } from "@/lib/mock-data";
 import type { SchemeRecommendation, UserProfile } from "@/lib/types";
@@ -27,22 +29,140 @@ const initial: UserProfile = {
   loan_required: 90000,
 };
 
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+}
+
 export default function RecommenderPage() {
   const [form, setForm] = useState<UserProfile>(initial);
   const [results, setResults] = useState<SchemeRecommendation[] | null>(null);
+
+  // AI Scheme Advisor Chat state
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      role: "assistant",
+      content:
+        "Hello! I am your **AI Scheme Advisor**. Fill in your details above or ask me any question about government schemes, eligibility, or benefits.",
+    },
+  ]);
+  const [chatInput, setChatInput] = useState("");
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [sessionId] = useState(() => "session_" + Math.random().toString(36).substring(2, 9));
+  const chatBottomRef = useRef<HTMLDivElement | null>(null);
 
   function update<K extends keyof UserProfile>(key: K, value: UserProfile[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
+  useEffect(() => {
+    chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isStreaming]);
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // NOTE: real scoring lives in ai/scheme_matcher.py (match_schemes) and needs
-    // a backend endpoint. Until that exists, this shows the sample dataset
-    // shaped exactly like match_schemes()'s output so the UI is ready to swap in.
     setResults(sampleRecommendations);
     if (typeof window !== "undefined") {
       window.localStorage.setItem("ys_last_recommendations", JSON.stringify(sampleRecommendations));
+    }
+  }
+
+  async function handleSendChat(e: React.FormEvent) {
+    e.preventDefault();
+    const prompt = chatInput.trim();
+    if (!prompt || isStreaming) return;
+
+    setChatInput("");
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: prompt },
+      { role: "assistant", content: "" },
+    ]);
+    setIsStreaming(true);
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/schemes/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: prompt,
+          session_id: sessionId,
+          user_data: form,
+          top_3_schemes: results,
+        }),
+      });
+
+      if (!response.ok || !response.body) {
+        throw new Error(`Server returned status ${response.status}`);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (trimmed.startsWith("data: ")) {
+            const dataStr = trimmed.slice(6);
+            if (dataStr === "[DONE]") break;
+            try {
+              const parsed = JSON.parse(dataStr);
+              if (parsed.content) {
+                setMessages((prev) => {
+                  const updated = [...prev];
+                  const lastIdx = updated.length - 1;
+                  if (lastIdx >= 0 && updated[lastIdx].role === "assistant") {
+                    updated[lastIdx] = {
+                      ...updated[lastIdx],
+                      content: updated[lastIdx].content + parsed.content,
+                    };
+                  }
+                  return updated;
+                });
+              } else if (parsed.error) {
+                setMessages((prev) => {
+                  const updated = [...prev];
+                  const lastIdx = updated.length - 1;
+                  if (lastIdx >= 0 && updated[lastIdx].role === "assistant") {
+                    updated[lastIdx] = {
+                      ...updated[lastIdx],
+                      content: updated[lastIdx].content + `\n\n*Error: ${parsed.error}*`,
+                    };
+                  }
+                  return updated;
+                });
+              }
+            } catch {
+              // ignore parse errors for partial chunks
+            }
+          }
+        }
+      }
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : "Failed to fetch response";
+      setMessages((prev) => {
+        const updated = [...prev];
+        const lastIdx = updated.length - 1;
+        if (lastIdx >= 0 && updated[lastIdx].role === "assistant") {
+          if (!updated[lastIdx].content) {
+            updated[lastIdx] = {
+              ...updated[lastIdx],
+              content: `*Unable to connect to AI Scheme Advisor backend (${errMsg}). Please check backend status.*`,
+            };
+          }
+        }
+        return updated;
+      });
+    } finally {
+      setIsStreaming(false);
     }
   }
 
@@ -51,8 +171,8 @@ export default function RecommenderPage() {
       <Topbar title="Scheme recommender" subtitle="Fill in your details to see eligible schemes." />
 
       <div className="flex-1 px-5 py-6 sm:px-8 sm:py-8">
-        <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
-          <div className="space-y-5 rounded-3xl border border-navy/10 bg-card p-6 sm:p-7">
+        <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
+          <form onSubmit={handleSubmit} className="space-y-5 rounded-3xl border border-navy/10 bg-card p-6 sm:p-7">
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="text-sm font-medium text-ink">
                 Category
@@ -204,7 +324,7 @@ export default function RecommenderPage() {
             >
               Find matching schemes
             </button>
-          </div>
+          </form>
 
           <div className="space-y-4">
             {!results && (
@@ -268,9 +388,85 @@ export default function RecommenderPage() {
                 </a>
               </div>
             ))}
+
+            {/* AI SCHEME ADVISOR CHATBOT */}
+            <div className="rounded-3xl border border-navy/10 bg-card p-6 shadow-sm">
+              <div className="flex items-center gap-2 border-b border-navy/10 pb-3">
+                <span className="grid h-7 w-7 place-items-center rounded-lg bg-saffron text-xs font-bold text-white">
+                  AI
+                </span>
+                <div>
+                  <h4 className="font-display text-base text-ink">AI Scheme Advisor</h4>
+                  <p className="text-[11px] text-muted">Ask follow-up questions about schemes & eligibility</p>
+                </div>
+              </div>
+
+              <div className="mt-4 max-h-80 min-h-[160px] space-y-3 overflow-y-auto pr-1">
+                {messages.map((msg, i) => (
+                  <div
+                    key={i}
+                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                  >
+                    <div
+                      className={`max-w-[90%] rounded-2xl px-4 py-3 text-sm ${
+                        msg.role === "user"
+                          ? "bg-saffron text-white"
+                          : "bg-navy/5 text-ink border border-navy/10"
+                      }`}
+                    >
+                      {msg.role === "user" ? (
+                        <p className="whitespace-pre-wrap">{msg.content}</p>
+                      ) : (
+                        <div className="prose prose-sm max-w-none text-ink">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                              h1: ({ ...props }) => <h1 className="text-base font-bold my-1 text-ink" {...props} />,
+                              h2: ({ ...props }) => <h2 className="text-sm font-bold my-1 text-ink" {...props} />,
+                              h3: ({ ...props }) => <h3 className="text-xs font-bold my-1 text-ink" {...props} />,
+                              p: ({ ...props }) => <p className="mb-1.5 last:mb-0 leading-relaxed" {...props} />,
+                              ul: ({ ...props }) => <ul className="list-disc list-inside mb-2 space-y-0.5" {...props} />,
+                              ol: ({ ...props }) => <ol className="list-decimal list-inside mb-2 space-y-0.5" {...props} />,
+                              li: ({ ...props }) => <li className="ml-1" {...props} />,
+                              strong: ({ ...props }) => <strong className="font-semibold text-saffron-deep" {...props} />,
+                              table: ({ ...props }) => <table className="w-full text-xs border-collapse border border-navy/20 my-2" {...props} />,
+                              th: ({ ...props }) => <th className="border border-navy/20 px-2 py-1 bg-navy/10 font-semibold text-ink" {...props} />,
+                              td: ({ ...props }) => <td className="border border-navy/20 px-2 py-1 text-ink" {...props} />,
+                              code: ({ ...props }) => <code className="bg-navy/10 px-1 py-0.5 rounded text-xs font-mono" {...props} />,
+                            }}
+                          >
+                            {msg.content || (isStreaming && i === messages.length - 1 ? "Thinking..." : "")}
+                          </ReactMarkdown>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                <div ref={chatBottomRef} />
+              </div>
+
+              <form onSubmit={handleSendChat} className="mt-4 flex gap-2">
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder="Ask a question about your scheme match..."
+                  disabled={isStreaming}
+                  className="flex-1 rounded-xl border border-navy/15 bg-background px-4 py-2 text-sm outline-none focus:border-saffron focus:ring-2 focus:ring-saffron/10 disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  disabled={isStreaming || !chatInput.trim()}
+                  className="rounded-xl bg-saffron px-4 py-2 text-sm font-semibold text-white hover:bg-saffron-deep disabled:opacity-50"
+                >
+                  {isStreaming ? "..." : "Send"}
+                </button>
+              </form>
+            </div>
           </div>
-        </form>
+        </div>
       </div>
     </>
   );
 }
+

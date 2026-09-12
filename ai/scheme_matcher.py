@@ -543,6 +543,31 @@ Top 3 Recommended Schemes:
         )
         return response.content
 
+    def stream(self, user_prompt):
+        if not user_prompt:
+            return
+        for chunk in self.runnable.stream(
+            {"input": user_prompt},
+            config={"configurable": {"session_id": self.session_id}},
+        ):
+            if hasattr(chunk, "content"):
+                yield chunk.content
+            elif isinstance(chunk, str):
+                yield chunk
+
+    async def astream(self, user_prompt):
+        if not user_prompt:
+            return
+        async for chunk in self.runnable.astream(
+            {"input": user_prompt},
+            config={"configurable": {"session_id": self.session_id}},
+        ):
+            if hasattr(chunk, "content"):
+                yield chunk.content
+            elif isinstance(chunk, str):
+                yield chunk
+
+
 
 if __name__ == "__main__":
     json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "schemes.json")
