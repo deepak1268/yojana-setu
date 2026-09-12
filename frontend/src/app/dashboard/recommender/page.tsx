@@ -14,6 +14,16 @@ const educations = ["10th", "12th", "graduate", "postgraduate", "any"];
 const purposes = ["business", "education", "housing", "agriculture"];
 const projectTypes = ["micro_business", "manufacturing", "services", "higher_education"];
 
+const suggestedPrompts = [
+  "Why was this scheme recommended?",
+  "What are the eligibility requirements?",
+  "How much loan can I get?",
+  "What is the interest rate?",
+  "What documents are required?",
+  "Which of the 3 schemes is better for me?",
+  "Can I use this scheme for my purpose?",
+];
+
 const initial: UserProfile = {
   category: "SC",
   gender: "Male",
@@ -40,13 +50,18 @@ export default function RecommenderPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Chatbot states
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  // AI Scheme Advisor Chat state
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      role: "assistant",
+      content:
+        "Hello! I am your **AI Scheme Advisor**. Fill in your details above or ask me any question about government schemes, eligibility, or benefits.",
+    },
+  ]);
   const [chatInput, setChatInput] = useState("");
-  const [chatLoading, setChatLoading] = useState(false);
-  const [chatError, setChatError] = useState<string | null>(null);
-  const [sessionId, setSessionId] = useState<string>("");
-  const chatEndRef = useRef<HTMLDivElement | null>(null);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [sessionId] = useState(() => "session_" + Math.random().toString(36).substring(2, 9));
+  const chatBottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -70,28 +85,8 @@ export default function RecommenderPage() {
           // Ignore
         }
       }
-      setSessionId(Math.random().toString(36).substring(2, 11));
     }
   }, []);
-
-  useEffect(() => {
-    if (chatMessages.length > 0) {
-      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [chatMessages, chatLoading]);
-
-  // AI Scheme Advisor Chat state
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content:
-        "Hello! I am your **AI Scheme Advisor**. Fill in your details above or ask me any question about government schemes, eligibility, or benefits.",
-    },
-  ]);
-  const [chatInput, setChatInput] = useState("");
-  const [isStreaming, setIsStreaming] = useState(false);
-  const [sessionId] = useState(() => "session_" + Math.random().toString(36).substring(2, 9));
-  const chatBottomRef = useRef<HTMLDivElement | null>(null);
 
   function update<K extends keyof UserProfile>(key: K, value: UserProfile[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -101,17 +96,29 @@ export default function RecommenderPage() {
     chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isStreaming]);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setResults(sampleRecommendations);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("ys_last_recommendations", JSON.stringify(sampleRecommendations));
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchSchemeMatches(form);
+      const recs = data.recommendations || [];
+      setResults(recs);
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("ys_last_recommendations", JSON.stringify(recs));
+        window.localStorage.setItem("ys_user_profile", JSON.stringify(form));
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to fetch recommendations";
+      setError(msg);
+    } finally {
+      setLoading(false);
     }
   }
 
-  async function handleSendChat(e: React.FormEvent) {
-    e.preventDefault();
-    const prompt = chatInput.trim();
+  async function handleSendChat(e?: React.FormEvent, overridePrompt?: string) {
+    if (e) e.preventDefault();
+    const prompt = (overridePrompt || chatInput).trim();
     if (!prompt || isStreaming) return;
 
     setChatInput("");
@@ -454,6 +461,21 @@ export default function RecommenderPage() {
                   <h4 className="font-display text-base text-ink">AI Scheme Advisor</h4>
                   <p className="text-[11px] text-muted">Ask follow-up questions about schemes & eligibility</p>
                 </div>
+              </div>
+
+              {/* Suggested prompt chips */}
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {suggestedPrompts.map((prompt) => (
+                  <button
+                    key={prompt}
+                    type="button"
+                    disabled={isStreaming}
+                    onClick={() => handleSendChat(undefined, prompt)}
+                    className="rounded-full border border-navy/15 bg-background px-3 py-1 text-xs font-medium text-ink transition hover:border-saffron hover:bg-saffron/5 hover:text-saffron-deep disabled:opacity-50 text-left"
+                  >
+                    {prompt}
+                  </button>
+                ))}
               </div>
 
               <div className="mt-4 max-h-80 min-h-[160px] space-y-3 overflow-y-auto pr-1">
