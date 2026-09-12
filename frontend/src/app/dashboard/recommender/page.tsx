@@ -388,19 +388,14 @@ export default function RecommenderPage() {
 
             {results && results.length > 0 && (
               <div className="rounded-3xl border border-navy/10 bg-card p-6 sm:p-7 shadow-xs">
-                <div className="flex items-center justify-between border-b border-navy/10 pb-4">
-                  <div>
-                    <h3 className="font-display text-lg text-ink flex items-center gap-2">
-                      <span className="flex h-2.5 w-2.5 rounded-full bg-green" />
-                      AI Scheme Advisor
-                    </h3>
-                    <p className="text-xs text-muted mt-0.5">
-                      Ask follow-up questions specifically about your recommended schemes.
-                    </p>
-                  </div>
-                  <span className="rounded-full bg-saffron/15 px-3 py-1 text-xs font-semibold text-saffron-deep">
-                    Python AI
-                  </span>
+                <div className="border-b border-navy/10 pb-4">
+                  <h3 className="font-display text-lg text-ink flex items-center gap-2">
+                    <span className="flex h-2.5 w-2.5 rounded-full bg-green" />
+                    AI Scheme Advisor
+                  </h3>
+                  <p className="text-xs text-muted mt-0.5">
+                    Ask follow-up questions specifically about your recommended schemes.
+                  </p>
                 </div>
 
                 {/* Suggested prompt chips */}

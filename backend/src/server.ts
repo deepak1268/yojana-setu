@@ -10,17 +10,17 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors({
-    origin: "http://localhost:3001",
+    origin: process.env.FRONTEND_URL,
     credentials: true
 }));
 app.use(express.json());
 app.get("/", (req, res) => {
-  res.send("Backend is working");
+    res.send("Backend is working");
 });
-app.use("/api/auth",authRouter);
+app.use("/api/auth", authRouter);
 
 connectDB().then(() => {
-    app.listen(port,() => {
+    app.listen(port, () => {
         console.log(`Server is up and running on ${port}`);
     });
 });

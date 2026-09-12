@@ -36,17 +36,13 @@ export default function login() {
   const [isPending, startTransition] = useTransition();
   const { setUser, loading, setLoading } = useAuth();
   const googleButtonRef = useRef<HTMLDivElement>(null);
-  console.log(
-  "Google Client ID:",
-  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
-);
   
   const handleGoogleResponse = async (response: { credential: string }) => {
     setLoading(true);
 
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/auth/google",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`,
         {
           credential: response.credential,
         }
@@ -90,7 +86,7 @@ export default function login() {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/auth/login",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
         {
           email,
           password,

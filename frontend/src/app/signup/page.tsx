@@ -42,7 +42,7 @@ export default function signup() {
 
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/auth/google",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`,
         {
           credential: response.credential,
         }
@@ -91,7 +91,7 @@ export default function signup() {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/auth/signup",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup`,
         {
           name,
           email,
