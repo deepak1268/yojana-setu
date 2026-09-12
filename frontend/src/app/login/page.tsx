@@ -34,19 +34,15 @@ declare global {
 
 export default function login() {
   const [isPending, startTransition] = useTransition();
-  const { setUser, loading, setLoading } = useAuth();
+  const { login: authLogin, loading, setLoading } = useAuth();
   const googleButtonRef = useRef<HTMLDivElement>(null);
-  console.log(
-  "Google Client ID:",
-  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
-);
   
   const handleGoogleResponse = async (response: { credential: string }) => {
     setLoading(true);
 
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/auth/google",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`,
         {
           credential: response.credential,
         }
@@ -54,11 +50,9 @@ export default function login() {
 
       const { token, user } = res.data;
 
-      localStorage.setItem("token", token);
+      authLogin(token, user);
 
-      setUser(user);
-
-      toast.success("Welcome! You're signed in successfully.!");
+      toast.success("Welcome! You're signed in successfully!");
 
       console.log("Google signup successful:", user);
       window.location.href = "/dashboard";
@@ -90,7 +84,7 @@ export default function login() {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/auth/login",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
         {
           email,
           password,
@@ -99,13 +93,10 @@ export default function login() {
 
       const { token, user } = response.data;
 
-      // Store JWT
-      localStorage.setItem("token", token);
-
-      // Store logged-in user in AuthContext
-      setUser(user);
+      authLogin(token, user);
 
       toast.success("Login successful!");
+      window.location.href = "/dashboard";
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;
@@ -214,7 +205,7 @@ export default function login() {
                 disabled={loading}
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-saffron px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-saffron/20 transition hover:-translate-y-0.5 hover:bg-saffron-deep active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {loading ? "Signing up..." : "Create account"}
+                {loading ? "Logging in..." : "Login"}
 
                 {!loading && (
                   <span aria-hidden="true" className="text-lg leading-none">

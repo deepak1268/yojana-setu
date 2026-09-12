@@ -1,19 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { isLoggedIn, getUserName } from "@/lib/auth";
-
+import { useAuth } from "@/context/AuthContext";
 
 export function Header() {
-  const [authed, setAuthed] = useState(false);
-const [initial, setInitial] = useState("A");
-
-  useEffect(() => {
-  setAuthed(isLoggedIn());
-  const name = getUserName();
-  if (name) setInitial(name.charAt(0).toUpperCase());
-}, []);
+  const { user, initialLoading } = useAuth();
+  const authed = !initialLoading && Boolean(user);
+  const initial = user?.name ? user.name.trim().charAt(0).toUpperCase() : "U";
 
   return (
     <header className="sticky top-0 z-50 border-b border-navy/10 bg-cream/85 backdrop-blur-md">

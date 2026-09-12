@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Topbar } from "@/components/dashboard/Topbar";
-import { sampleRecommendations } from "@/lib/mock-data";
+import { fetchSchemeChat, fetchSchemeMatches } from "@/lib/api";
 import type { SchemeRecommendation, UserProfile } from "@/lib/types";
 
 const categories = ["SC", "ST", "OBC", "General"];
@@ -37,6 +37,48 @@ interface Message {
 export default function RecommenderPage() {
   const [form, setForm] = useState<UserProfile>(initial);
   const [results, setResults] = useState<SchemeRecommendation[] | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Chatbot states
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatInput, setChatInput] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatError, setChatError] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string>("");
+  const chatEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = window.localStorage.getItem("ys_last_recommendations");
+      const storedProfile = window.localStorage.getItem("ys_user_profile");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored) as SchemeRecommendation[];
+          if (parsed && parsed.length > 0) {
+            setResults(parsed);
+          }
+        } catch {
+          // Ignore parse error
+        }
+      }
+      if (storedProfile) {
+        try {
+          const parsedProf = JSON.parse(storedProfile) as UserProfile;
+          if (parsedProf) setForm(parsedProf);
+        } catch {
+          // Ignore
+        }
+      }
+      setSessionId(Math.random().toString(36).substring(2, 11));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (chatMessages.length > 0) {
+      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatMessages, chatLoading]);
 
   // AI Scheme Advisor Chat state
   const [messages, setMessages] = useState<Message[]>([
@@ -320,16 +362,29 @@ export default function RecommenderPage() {
 
             <button
               type="submit"
-              className="w-full rounded-full bg-saffron px-5 py-3 text-sm font-semibold text-white hover:bg-saffron-deep"
+              disabled={loading}
+              className="w-full rounded-full bg-saffron px-5 py-3 text-sm font-semibold text-white hover:bg-saffron-deep disabled:opacity-50"
             >
-              Find matching schemes
+              {loading ? "Finding matching schemes..." : "Find matching schemes"}
             </button>
           </form>
 
           <div className="space-y-4">
-            {!results && (
+            {error && (
+              <div className="rounded-3xl border border-red-500/20 bg-red-500/10 p-6 text-sm text-red-600">
+                {error}
+              </div>
+            )}
+
+            {!results && !error && (
               <div className="rounded-3xl border border-dashed border-navy/15 p-8 text-center text-sm text-muted">
-                Fill in the form and submit to see your top matched schemes.
+                {loading ? "Matching applicant profile against schemes..." : "Fill in the form and submit to see your top matched schemes."}
+              </div>
+            )}
+
+            {results && results.length === 0 && !error && (
+              <div className="rounded-3xl border border-dashed border-navy/15 p-8 text-center text-sm text-muted">
+                No recommendation available.
               </div>
             )}
 
@@ -408,11 +463,10 @@ export default function RecommenderPage() {
                     className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[90%] rounded-2xl px-4 py-3 text-sm ${
-                        msg.role === "user"
+                      className={`max-w-[90%] rounded-2xl px-4 py-3 text-sm ${msg.role === "user"
                           ? "bg-saffron text-white"
                           : "bg-navy/5 text-ink border border-navy/10"
-                      }`}
+                        }`}
                     >
                       {msg.role === "user" ? (
                         <p className="whitespace-pre-wrap">{msg.content}</p>

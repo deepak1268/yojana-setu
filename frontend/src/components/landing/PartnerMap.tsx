@@ -20,6 +20,8 @@ export interface PartnerLocation {
   timing?: string;
   lat: number;
   lng: number;
+  distance_km?: number;
+  processing_capacity?: string;
 }
 
 export const DEFAULT_PARTNERS: PartnerLocation[] = [
@@ -76,9 +78,11 @@ export const DEFAULT_USER_POSITION = {
 
 interface MapControllerProps {
   targetLocation?: { lat: number; lng: number } | null;
+  userPosition?: { lat: number; lng: number } | null;
+  partners?: PartnerLocation[];
 }
 
-function MapController({ targetLocation }: MapControllerProps) {
+function MapController({ targetLocation, userPosition, partners = [] }: MapControllerProps) {
   const map = useMap();
 
   useEffect(() => {
@@ -88,6 +92,23 @@ function MapController({ targetLocation }: MapControllerProps) {
     }
   }, [map, targetLocation]);
 
+  useEffect(() => {
+    if (!map || targetLocation) return;
+    if (typeof window !== "undefined" && window.google?.maps) {
+      if (partners.length > 0) {
+        const bounds = new window.google.maps.LatLngBounds();
+        if (userPosition) {
+          bounds.extend(userPosition);
+        }
+        partners.forEach((p) => bounds.extend({ lat: p.lat, lng: p.lng }));
+        map.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
+      } else if (userPosition) {
+        map.panTo(userPosition);
+        map.setZoom(12);
+      }
+    }
+  }, [map, partners, userPosition, targetLocation]);
+
   return null;
 }
 
@@ -95,7 +116,7 @@ export interface PartnerMapProps {
   partners?: PartnerLocation[];
   selectedPartnerId?: string | null;
   onSelectPartner?: (partner: PartnerLocation | null) => void;
-  userPosition?: { lat: number; lng: number };
+  userPosition?: { lat: number; lng: number } | null;
   className?: string;
   height?: string;
 }
@@ -104,12 +125,14 @@ export default function PartnerMap({
   partners = DEFAULT_PARTNERS,
   selectedPartnerId,
   onSelectPartner,
-  userPosition = DEFAULT_USER_POSITION,
+  userPosition,
   className = "",
   height = "380px",
 }: PartnerMapProps) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
   const mapId = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID || "DEMO_MAP_ID";
+
+  const effectiveUserPos = userPosition !== undefined ? userPosition : DEFAULT_USER_POSITION;
 
   const [internalSelectedId, setInternalSelectedId] = useState<string | null>(null);
 
@@ -158,7 +181,7 @@ export default function PartnerMap({
     >
       <APIProvider apiKey={apiKey}>
         <Map
-          defaultCenter={userPosition}
+          defaultCenter={effectiveUserPos || DEFAULT_USER_POSITION}
           defaultZoom={12}
           mapId={mapId}
           gestureHandling="cooperative"
@@ -169,12 +192,16 @@ export default function PartnerMap({
             targetLocation={
               activePartner ? { lat: activePartner.lat, lng: activePartner.lng } : null
             }
+            userPosition={effectiveUserPos}
+            partners={partners}
           />
 
           {/* User Location Marker ("You") */}
-          <AdvancedMarker position={userPosition} title="You (Detected Location)">
-            <Pin background="#e36a1a" glyphColor="#ffffff" borderColor="#c45312" scale={1.15} />
-          </AdvancedMarker>
+          {effectiveUserPos && (
+            <AdvancedMarker position={effectiveUserPos} title="You (Detected Location)">
+              <Pin background="#e36a1a" glyphColor="#ffffff" borderColor="#c45312" scale={1.15} />
+            </AdvancedMarker>
+          )}
 
           {/* Partner Locations Markers */}
           {partners.map((partner) => {
@@ -221,9 +248,17 @@ export default function PartnerMap({
                   </p>
                 )}
                 <div className="mt-2 flex items-center justify-between border-t border-navy/10 pt-1.5 text-[11px]">
-                  <span className="font-medium text-muted">{activePartner.city}</span>
+                  <span className="font-medium text-muted">
+                    {activePartner.distance_km !== undefined
+                      ? `${activePartner.distance_km.toFixed(1)} km away`
+                      : activePartner.city}
+                  </span>
                   <a
-                    href={`https://www.google.com/maps/dir/?api=1&destination=${activePartner.lat},${activePartner.lng}`}
+                    href={
+                      effectiveUserPos
+                        ? `https://www.google.com/maps/dir/?api=1&origin=${effectiveUserPos.lat},${effectiveUserPos.lng}&destination=${activePartner.lat},${activePartner.lng}`
+                        : `https://www.google.com/maps/dir/?api=1&destination=${activePartner.lat},${activePartner.lng}`
+                    }
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-semibold text-saffron hover:underline"

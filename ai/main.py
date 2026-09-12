@@ -8,6 +8,7 @@ via REST API endpoints while strictly preserving underlying business logic.
 from contextlib import asynccontextmanager
 import json
 import os
+import uuid
 from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException
@@ -117,6 +118,13 @@ class SchemeMatchRequest(BaseModel):
     )
 
 
+class SchemeChatRequest(BaseModel):
+    session_id: Optional[str] = Field(None, description="Optional session ID for chat continuity")
+    message: str = Field(..., description="User question for the scheme advisor AI")
+    user_data: Optional[Dict[str, Any]] = Field(None, description="Applicant profile dictionary")
+    scheme_ids: Optional[List[str]] = Field(None, description="List of recommended scheme IDs")
+
+
 class EmiCalculatorRequest(BaseModel):
     scheme_id: str = Field(
         ..., json_schema_extra={"example": "MFS"}, description="Selected government scheme ID"
@@ -140,9 +148,8 @@ class EmiCalculatorRequest(BaseModel):
 
 
 class PartnerLocateRequest(BaseModel):
-    scheme_id: str = Field(
-        ..., json_schema_extra={"example": "MFS"}, description="Selected government scheme ID"
-    )
+    scheme_id: Optional[str] = Field(None, json_schema_extra={"example": "MFS"}, description="Single scheme ID")
+    scheme_ids: Optional[List[str]] = Field(None, description="List of target recommended scheme IDs")
     latitude: float = Field(
         ..., ge=-90.0, le=90.0, json_schema_extra={"example": 28.6139}, description="Applicant latitude"
     )
@@ -328,12 +335,17 @@ def calculate_emi_endpoint(request: EmiCalculatorRequest):
 )
 def locate_partners_endpoint(request: PartnerLocateRequest):
     """
-    Exposes existing partner_locator.get_top_partners function.
+    Exposes existing partner_locator.get_top_partners function for single or multi-scheme lookup.
     """
     partners = load_partners()
 
+    target_scheme_ids = request.scheme_ids or ([request.scheme_id] if request.scheme_id else [])
+
+    if not target_scheme_ids:
+        raise HTTPException(status_code=400, detail="Must provide scheme_id or scheme_ids.")
+
     top_partners = get_top_partners(
-        request.scheme_id,
+        target_scheme_ids,
         request.latitude,
         request.longitude,
         partners,
@@ -345,14 +357,14 @@ def locate_partners_endpoint(request: PartnerLocateRequest):
             "message": "No eligible channel partner found.",
         }
 
-    # Clean internal score fields (_routing_score, _distance_km) from public response
-    clean_partners = [
-        {k: v for k, v in partner.items() if not k.startswith("_")}
-        for partner in top_partners
-    ]
+    for p in top_partners:
+        if "_distance_km" in p:
+            p["distance_km"] = round(p["_distance_km"], 1)
+        if "type" in p and "partner_type" not in p:
+            p["partner_type"] = p["type"]
 
     return {
-        "partners": clean_partners,
+        "partners": top_partners,
     }
 
 

@@ -42,6 +42,7 @@ export interface Partner {
   partner_id: string;
   name: string;
   type: "SCA" | "PSB" | "RRB" | "NBFC-MFI";
+  partner_type?: string;
   state: string;
   city: string;
   latitude: number;
@@ -56,6 +57,107 @@ export interface Partner {
 
 // Extra fields partner_locator.py attaches after ranking (rank_partners)
 export interface RankedPartner extends Partner {
-  _routing_score: number;
-  _distance_km: number;
+  _routing_score?: number;
+  _distance_km?: number;
+  distance_km?: number;
+}
+
+// FastAPI Response for POST /schemes/match
+export interface SchemeMatchResponse {
+  recommendations: SchemeRecommendation[];
+  total_eligible: number;
+  message?: string;
+}
+
+// FastAPI Request for POST /calculator/emi
+export interface EmiCalculatorRequest {
+  scheme_id: string;
+  loan_amount: number;
+  interest_rate?: number;
+  tenure_months: number;
+  moratorium_months: number;
+}
+
+// Summary object returned inside EmiCalculatorResponse
+export interface EmiSummary {
+  loan_amount: number;
+  tenure_months: number;
+  moratorium_months: number;
+  monthly_emi: number;
+  total_interest: number;
+  total_repayment: number;
+}
+
+// Amortization row returned in amortization_schedule
+export interface AmortizationRow {
+  month: number;
+  phase: string;
+  opening: number;
+  payment: number;
+  interest: number;
+  principal: number;
+  closing: number;
+}
+
+// FastAPI Response for POST /calculator/emi
+export interface EmiCalculatorResponse {
+  scheme_id: string;
+  scheme_name: string;
+  interest_rate_used: number;
+  summary: EmiSummary;
+  amortization_schedule: AmortizationRow[];
+}
+
+// Scheme summary from GET /schemes
+export interface SchemeSummary {
+  scheme_id: string;
+  name: string;
+  description?: string;
+  max_amount?: number | null;
+  min_amount?: number | null;
+  interest_rate?: number | null;
+  interest_rate_str?: string;
+  min_rate?: number | null;
+  max_rate?: number | null;
+  max_tenure?: number | null;
+  min_tenure?: number | null;
+  max_moratorium?: number | null;
+  min_moratorium?: number | null;
+  categories?: string[];
+  gender?: string[];
+  purpose?: string[];
+  states?: string[];
+}
+
+export interface SchemeListResponse {
+  schemes: SchemeSummary[];
+  total: number;
+}
+
+// FastAPI Request for POST /schemes/chat
+export interface SchemeChatRequest {
+  session_id?: string;
+  message: string;
+  scheme_ids: string[];
+  user_data?: Partial<UserProfile>;
+}
+
+// FastAPI Response for POST /schemes/chat
+export interface SchemeChatResponse {
+  session_id: string;
+  response: string;
+}
+
+// FastAPI Request for POST /partners/locate
+export interface PartnerLocateRequest {
+  scheme_id?: string;
+  scheme_ids?: string[];
+  latitude: number;
+  longitude: number;
+}
+
+// FastAPI Response for POST /partners/locate
+export interface PartnerLocateResponse {
+  partners: RankedPartner[];
+  message?: string;
 }
