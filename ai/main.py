@@ -121,10 +121,21 @@ class SchemeMatchRequest(BaseModel):
 
 
 class SchemeChatRequest(BaseModel):
-    session_id: Optional[str] = Field(None, description="Optional session ID for chat continuity")
-    message: str = Field(..., description="User question for the scheme advisor AI")
-    user_data: Optional[Dict[str, Any]] = Field(None, description="Applicant profile dictionary")
-    scheme_ids: Optional[List[str]] = Field(None, description="List of recommended scheme IDs")
+    message: str = Field(
+        ..., json_schema_extra={"example": "Explain the top recommended schemes for me"}, description="User query or message"
+    )
+    session_id: Optional[str] = Field(
+        "default_session", json_schema_extra={"example": "session-123"}, description="Conversation session ID"
+    )
+    user_data: Optional[Dict[str, Any]] = Field(
+        None, description="Optional applicant profile dictionary"
+    )
+    scheme_ids: Optional[List[str]] = Field(
+        None, description="List of recommended scheme IDs"
+    )
+    top_3_schemes: Optional[List[Dict[str, Any]]] = Field(
+        None, description="Optional pre-calculated top recommended schemes list"
+    )
 
 
 class EmiCalculatorRequest(BaseModel):
@@ -157,21 +168,6 @@ class PartnerLocateRequest(BaseModel):
     )
     longitude: float = Field(
         ..., ge=-180.0, le=180.0, json_schema_extra={"example": 77.2090}, description="Applicant longitude"
-    )
-
-
-class SchemeChatRequest(BaseModel):
-    message: str = Field(
-        ..., json_schema_extra={"example": "Explain the top recommended schemes for me"}, description="User query or message"
-    )
-    session_id: Optional[str] = Field(
-        "default_session", json_schema_extra={"example": "session-123"}, description="Conversation session ID"
-    )
-    user_data: Optional[Dict[str, Any]] = Field(
-        None, description="Optional applicant profile dictionary"
-    )
-    top_3_schemes: Optional[List[Dict[str, Any]]] = Field(
-        None, description="Optional pre-calculated top recommended schemes list"
     )
 
 
@@ -367,6 +363,141 @@ def locate_partners_endpoint(request: PartnerLocateRequest):
 
     return {
         "partners": top_partners,
+    }
+
+
+@app.get(
+    "/schemes",
+    summary="Get or Filter Government Schemes",
+    description="Retrieves government schemes dataset with optional search, category, purpose, state, and gender filtering.",
+    tags=["Scheme Catalog"],
+)
+def get_schemes_endpoint(
+    search: Optional[str] = None,
+    category: Optional[str] = None,
+    purpose: Optional[str] = None,
+    state: Optional[str] = None,
+    gender: Optional[str] = None,
+):
+    """
+    Returns filtered schemes from schemes.json based on search query, category, purpose, state, and gender.
+    """
+    schemes = fetch_schemes()
+    filtered_schemes = []
+
+    search_clean = search.strip().lower() if search and search.strip() else None
+    cat_clean = (
+        category.strip().lower()
+        if category and category.strip() and category.strip().lower() != "all"
+        else None
+    )
+    purp_clean = (
+        purpose.strip().lower()
+        if purpose and purpose.strip() and purpose.strip().lower() != "all"
+        else None
+    )
+    state_clean = (
+        state.strip().lower()
+        if state and state.strip() and state.strip().lower() != "all"
+        else None
+    )
+    gender_clean = (
+        gender.strip().lower()
+        if gender and gender.strip() and gender.strip().lower() != "all"
+        else None
+    )
+
+    for s in schemes:
+        elig = s.get("eligibility") or {}
+        geo = s.get("geographical_scope") or {}
+
+        # 1. Category Filter
+        if cat_clean:
+            cats = [c.lower() for c in (elig.get("categories") or [])]
+            cat_matched = (
+                any(cat_clean == c or cat_clean in c for c in cats)
+                or (
+                    cat_clean == "sc"
+                    and (
+                        "scheduled caste" in (s.get("name") or "").lower()
+                        or "nsfdc" in (s.get("name") or "").lower()
+                    )
+                )
+                or (
+                    cat_clean == "st"
+                    and (
+                        "scheduled tribe" in (s.get("name") or "").lower()
+                        or "nstfdf" in (s.get("name") or "").lower()
+                    )
+                )
+            )
+            if not cat_matched:
+                continue
+
+        # 2. Search Keyword Filter (case-insensitive across relevant text fields)
+        if search_clean:
+            name = (s.get("name") or "").lower()
+            desc = (s.get("description") or "").lower()
+            sid = (s.get("scheme_id") or "").lower()
+            raw = (s.get("raw_text") or "").lower()
+            if (
+                search_clean not in name
+                and search_clean not in desc
+                and search_clean not in sid
+                and search_clean not in raw
+            ):
+                continue
+
+        # 3. Purpose Filter (optional)
+        if purp_clean:
+            purposes = [p.lower() for p in (s.get("purpose") or [])]
+            if (
+                not any(purp_clean in p or p in purp_clean for p in purposes)
+                and purp_clean not in (s.get("name") or "").lower()
+            ):
+                continue
+
+        # 4. State Filter (optional)
+        if state_clean:
+            states = [st.lower() for st in (geo.get("states") or [])]
+            gtype = (geo.get("type") or "").lower()
+            if (
+                states
+                and not any(state_clean == st or state_clean in st for st in states)
+                and gtype != "central"
+                and "all" not in states
+            ):
+                continue
+
+        # 5. Gender Filter (optional)
+        if gender_clean:
+            genders = [g.lower() for g in (elig.get("gender") or [])]
+            if genders and not any(gender_clean == g for g in genders):
+                continue
+
+        # Format scheme dictionary with financial details for catalog display
+        d = get_scheme_details(s)
+        item = {
+            **s,
+            "max_amount": d.get("max_amount"),
+            "min_amount": d.get("min_amount"),
+            "interest_rate": d.get("interest_rate"),
+            "interest_rate_str": d.get("interest_rate_str"),
+            "min_rate": d.get("min_rate"),
+            "max_rate": d.get("max_rate"),
+            "max_tenure": d.get("max_tenure"),
+            "min_tenure": d.get("min_tenure"),
+            "max_moratorium": d.get("max_moratorium"),
+            "min_moratorium": d.get("min_moratorium"),
+            "categories": elig.get("categories") or [],
+            "gender": elig.get("gender") or [],
+            "states": geo.get("states") or [],
+        }
+        filtered_schemes.append(item)
+
+    return {
+        "schemes": filtered_schemes,
+        "total": len(filtered_schemes),
     }
 
 

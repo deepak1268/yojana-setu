@@ -67,10 +67,9 @@ def run_tests():
             "user_data": test_user,
         })
         assert res2.status_code == 200, f"Chat failed on '{q}': {res2.text}"
-        data2 = res2.json()
-        ans = data2.get("response", "")
+        ans = res2.text
         assert len(ans.strip()) > 0, f"Empty answer for '{q}'"
-        print(f"  -> Q: '{q}' -> Response length: {len(ans)} chars")
+        print(f"  -> Q: '{q}' -> Response stream received ({len(ans)} bytes)")
 
     # Test 3: Complete Schemes Catalog & Filtering for Calculator
     print("\n[TEST 3] Testing /schemes catalog & filtering...")
