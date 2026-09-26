@@ -73,7 +73,7 @@ export default function RecommenderPage() {
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
 
   function getVoiceWsUrl(): string {
-    const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || "http://127.0.0.1:8000";
+    const baseUrl = (process.env.NEXT_PUBLIC_FASTAPI_URL || "http://127.0.0.1:8000").replace(/\/+$/, "");
     const wsProtocol = baseUrl.startsWith("https") ? "wss:" : "ws:";
     const host = baseUrl.replace(/^https?:\/\//, "");
     return `${wsProtocol}//${host}/ws/voice`;
@@ -307,7 +307,8 @@ export default function RecommenderPage() {
     setIsStreaming(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/schemes/chat", {
+      const fastApiUrl = (process.env.NEXT_PUBLIC_FASTAPI_URL || "http://127.0.0.1:8000").replace(/\/+$/, "");
+      const response = await fetch(`${fastApiUrl}/schemes/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
