@@ -63,6 +63,183 @@ export default function RecommenderPage() {
   const [sessionId] = useState(() => "session_" + Math.random().toString(36).substring(2, 9));
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
 
+  // Multilingual Voice Assistant state
+  const [isRecording, setIsRecording] = useState(false);
+  const [isVoiceProcessing, setIsVoiceProcessing] = useState(false);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
+
+  function getVoiceWsUrl(): string {
+    const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || "http://127.0.0.1:8000";
+    const wsProtocol = baseUrl.startsWith("https") ? "wss:" : "ws:";
+    const host = baseUrl.replace(/^https?:\/\//, "");
+    return `${wsProtocol}//${host}/ws/voice`;
+  }
+
+  async function startRecording() {
+    setVoiceError(null);
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.pause();
+      setIsPlayingAudio(false);
+    }
+    if (typeof window === "undefined" || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setVoiceError("Microphone input is not supported in this browser.");
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioChunksRef.current = [];
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : undefined,
+      });
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        stream.getTracks().forEach((track) => track.stop());
+        const mimeType = mediaRecorder.mimeType || "audio/webm";
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+        if (audioBlob.size > 0) {
+          await sendAudioToVoiceWs(audioBlob, mimeType);
+        }
+      };
+
+      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Microphone permission denied or failed to initialize.";
+      setVoiceError(msg);
+    }
+  }
+
+  function stopRecording() {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      setIsVoiceProcessing(true);
+    }
+  }
+
+  async function sendAudioToVoiceWs(audioBlob: Blob, mimeType: string) {
+    setIsVoiceProcessing(true);
+    setVoiceError(null);
+
+    try {
+      const arrayBuffer = await audioBlob.arrayBuffer();
+      const bytes = new Uint8Array(arrayBuffer);
+      let binary = "";
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      const audioB64 = btoa(binary);
+
+      const wsUrl = getVoiceWsUrl();
+      const ws = new WebSocket(wsUrl);
+
+      let userMsgAdded = false;
+
+      ws.onopen = () => {
+        ws.send(
+          JSON.stringify({
+            action: "voice_input",
+            audio: audioB64,
+            mime_type: mimeType,
+            session_id: sessionId,
+            user_data: form,
+            top_3_schemes: results,
+          })
+        );
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          if (msg.type === "transcription") {
+            setIsVoiceProcessing(false);
+            setIsStreaming(true);
+            setMessages((prev) => [
+              ...prev,
+              { role: "user", content: msg.text },
+              { role: "assistant", content: "" },
+            ]);
+            userMsgAdded = true;
+          } else if (msg.type === "text_chunk") {
+            setMessages((prev) => {
+              const updated = [...prev];
+              const lastIdx = updated.length - 1;
+              if (lastIdx >= 0 && updated[lastIdx].role === "assistant") {
+                updated[lastIdx] = {
+                  ...updated[lastIdx],
+                  content: updated[lastIdx].content + msg.content,
+                };
+              }
+              return updated;
+            });
+          } else if (msg.type === "text_done") {
+            setIsStreaming(false);
+          } else if (msg.type === "audio_response") {
+            try {
+              const audioUri = `data:${msg.mime_type || "audio/mp3"};base64,${msg.audio}`;
+              if (audioPlayerRef.current) {
+                audioPlayerRef.current.pause();
+              }
+              const audio = new Audio(audioUri);
+              audioPlayerRef.current = audio;
+              setIsPlayingAudio(true);
+              audio.onended = () => setIsPlayingAudio(false);
+              audio.onerror = () => setIsPlayingAudio(false);
+              audio.play().catch(() => setIsPlayingAudio(false));
+            } catch {
+              setIsPlayingAudio(false);
+            }
+          } else if (msg.type === "tts_error") {
+            console.warn(msg.message);
+          } else if (msg.type === "error") {
+            setIsVoiceProcessing(false);
+            setIsStreaming(false);
+            setVoiceError(msg.message);
+            if (!userMsgAdded) {
+              setMessages((prev) => [
+                ...prev,
+                { role: "assistant", content: `*Voice error: ${msg.message}*` },
+              ]);
+            }
+          } else if (msg.type === "done") {
+            setIsVoiceProcessing(false);
+            setIsStreaming(false);
+            ws.close();
+          }
+        } catch {
+          // Ignore JSON parse errors
+        }
+      };
+
+      ws.onerror = () => {
+        setIsVoiceProcessing(false);
+        setIsStreaming(false);
+        setVoiceError("WebSocket connection to voice service failed.");
+      };
+
+      ws.onclose = () => {
+        setIsVoiceProcessing(false);
+        setIsStreaming(false);
+      };
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : "Failed to send audio to voice service";
+      setIsVoiceProcessing(false);
+      setIsStreaming(false);
+      setVoiceError(errMsg);
+    }
+  }
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const stored = window.localStorage.getItem("ys_last_recommendations");
@@ -453,15 +630,28 @@ export default function RecommenderPage() {
 
             {/* AI SCHEME ADVISOR CHATBOT */}
             <div className="rounded-3xl border border-navy/10 bg-card p-6 shadow-sm">
-              <div className="flex items-center gap-2 border-b border-navy/10 pb-3">
-                <span className="grid h-7 w-7 place-items-center rounded-lg bg-saffron text-xs font-bold text-white">
-                  AI
-                </span>
-                <div>
-                  <h4 className="font-display text-base text-ink">AI Scheme Advisor</h4>
-                  <p className="text-[11px] text-muted">Ask follow-up questions about schemes & eligibility</p>
+              <div className="flex items-center justify-between border-b border-navy/10 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="grid h-7 w-7 place-items-center rounded-lg bg-saffron text-xs font-bold text-white">
+                    AI
+                  </span>
+                  <div>
+                    <h4 className="font-display text-base text-ink">AI Scheme Advisor</h4>
+                    <p className="text-[11px] text-muted">Ask follow-up questions about schemes & eligibility</p>
+                  </div>
                 </div>
+                {isPlayingAudio && (
+                  <span className="flex items-center gap-1.5 rounded-full bg-saffron/10 px-2.5 py-1 text-xs font-semibold text-saffron-deep animate-pulse">
+                    🔊 Playing response
+                  </span>
+                )}
               </div>
+
+              {voiceError && (
+                <div className="mt-3 rounded-xl border border-red-500/20 bg-red-500/10 p-2.5 text-xs text-red-600">
+                  {voiceError}
+                </div>
+              )}
 
               {/* Suggested prompt chips */}
               <div className="mt-4 flex flex-wrap gap-1.5">
@@ -521,18 +711,55 @@ export default function RecommenderPage() {
                 <div ref={chatBottomRef} />
               </div>
 
-              <form onSubmit={handleSendChat} className="mt-4 flex gap-2">
+              <form onSubmit={handleSendChat} className="mt-4 flex items-center gap-2">
                 <input
                   type="text"
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
-                  placeholder="Ask a question about your scheme match..."
-                  disabled={isStreaming}
+                  placeholder={
+                    isRecording
+                      ? "🔴 Recording..."
+                      : isVoiceProcessing
+                      ? "Processing voice..."
+                      : "Ask a question about your scheme match..."
+                  }
+                  disabled={isStreaming || isRecording || isVoiceProcessing}
                   className="flex-1 rounded-xl border border-navy/15 bg-background px-4 py-2 text-sm outline-none focus:border-saffron focus:ring-2 focus:ring-saffron/10 disabled:opacity-50"
                 />
+
+                <button
+                  type="button"
+                  onClick={isRecording ? stopRecording : startRecording}
+                  disabled={isStreaming || isVoiceProcessing}
+                  title={isRecording ? "Stop recording" : "Voice input"}
+                  className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold transition disabled:opacity-50 ${
+                    isRecording
+                      ? "bg-red-600 text-white animate-pulse"
+                      : isVoiceProcessing
+                      ? "bg-saffron/20 text-saffron-deep"
+                      : "bg-navy/10 text-navy hover:bg-navy/20"
+                  }`}
+                >
+                  {isRecording ? (
+                    <>
+                      <span className="h-2 w-2 rounded-full bg-white animate-ping" />
+                      <span>Stop</span>
+                    </>
+                  ) : isVoiceProcessing ? (
+                    <span>Processing...</span>
+                  ) : (
+                    <>
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                      </svg>
+                      <span className="hidden sm:inline">Voice</span>
+                    </>
+                  )}
+                </button>
+
                 <button
                   type="submit"
-                  disabled={isStreaming || !chatInput.trim()}
+                  disabled={isStreaming || !chatInput.trim() || isRecording || isVoiceProcessing}
                   className="rounded-xl bg-saffron px-4 py-2 text-sm font-semibold text-white hover:bg-saffron-deep disabled:opacity-50"
                 >
                   {isStreaming ? "..." : "Send"}

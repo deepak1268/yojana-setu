@@ -11,7 +11,9 @@ import os
 import uuid
 from typing import Any, Dict, List, Optional
 
-from fastapi import FastAPI, HTTPException
+import base64
+import requests
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
@@ -375,6 +377,260 @@ def root():
         "status": "online",
         "docs": "/docs",
     }
+
+
+# =============================================================================
+# MULTILINGUAL VOICE ASSISTANT (GEMINI STT + TTS WEBSOCKET)
+# =============================================================================
+
+def get_gemini_api_key() -> str:
+    """Returns Gemini API key from environment variables."""
+    return os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or ""
+
+
+def gemini_stt_sync(audio_bytes: bytes, mime_type: str) -> str:
+    """
+    Uses Google Gemini API for Speech-to-Text transcription.
+    Preserves exact language and native script spoken by the user.
+    """
+    api_key = get_gemini_api_key()
+    if not api_key:
+        raise ValueError("GEMINI_API_KEY environment variable is not configured.")
+
+    audio_b64 = base64.b64encode(audio_bytes).decode("utf-8")
+    
+    # Standardize mime_type if webm / unknown
+    clean_mime = mime_type.split(";")[0].strip() if mime_type else "audio/webm"
+    if clean_mime not in ["audio/webm", "audio/wav", "audio/mp3", "audio/ogg", "audio/m4a", "audio/flac"]:
+        clean_mime = "audio/webm"
+
+    stt_prompt = (
+        "You are a precise, verbatim multilingual Speech-to-Text transcriber.\n"
+        "Transcribe the provided audio clip into exact text in the original language and script spoken.\n\n"
+        "CRITICAL RULES:\n"
+        "1. If spoken in Hindi, output in Devanagari script (e.g. 'इस योजना के लिए मुझे कितना लोन मिल सकता है?').\n"
+        "2. If spoken in Hinglish (Hindi words spoken in English alphabet), output in Roman script (e.g. 'Mujhe is scheme ke liye kitna loan mil sakta hai?'). Do NOT convert Hinglish to Devanagari Hindi or English.\n"
+        "3. If spoken in English, output in English.\n"
+        "4. If spoken in Bengali, Marathi, Telugu, Tamil, Gujarati, Kannada, Malayalam, Punjabi, Urdu, output in the exact native script of that language.\n"
+        "5. Do NOT translate or convert the user's speech.\n"
+        "6. Output ONLY the raw transcribed text. Do NOT add quotes, labels, or extra commentary."
+    )
+
+    models_to_try = [
+        "gemini-2.5-flash",
+        "gemini-3.5-transcribe",
+        "gemini-3.6-flash",
+        "gemini-3.5-flash",
+    ]
+
+    last_error = None
+    for m in models_to_try:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent?key={api_key}"
+        payload = {
+            "contents": [
+                {
+                    "parts": [
+                        {
+                            "inline_data": {
+                                "mime_type": clean_mime,
+                                "data": audio_b64,
+                            }
+                        },
+                        {"text": stt_prompt},
+                    ]
+                }
+            ]
+        }
+        try:
+            r = requests.post(url, json=payload, timeout=30)
+            if r.status_code == 200:
+                res_data = r.json()
+                candidates = res_data.get("candidates", [])
+                if candidates:
+                    parts = candidates[0].get("content", {}).get("parts", [])
+                    if parts:
+                        text = parts[0].get("text", "").strip()
+                        if text:
+                            return text
+            else:
+                last_error = f"Model {m} returned {r.status_code}: {r.text}"
+        except Exception as ex:
+            last_error = str(ex)
+
+    raise RuntimeError(f"Gemini STT failed across all candidate models. Last error: {last_error}")
+
+
+def gemini_tts_sync(text: str) -> Dict[str, str]:
+    """
+    Uses Google Gemini API for native Text-to-Speech audio generation.
+    Supports multilingual spoken audio generation matching response text.
+    """
+    api_key = get_gemini_api_key()
+    if not api_key:
+        raise ValueError("GEMINI_API_KEY environment variable is not configured.")
+
+    tts_prompt = f"Read out the following text transcript aloud in a clear, natural human voice in its native language:\n\n{text}"
+
+    tts_models = [
+        "gemini-2.5-flash-preview-tts",
+        "gemini-3.8-flash-tts",
+        "gemini-3.1-flash-tts-preview",
+        "gemini-3.8-flash-lite-tts",
+    ]
+
+    last_error = None
+    for m in tts_models:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent?key={api_key}"
+        payload = {
+            "contents": [
+                {
+                    "parts": [
+                        {"text": tts_prompt}
+                    ]
+                }
+            ],
+            "generationConfig": {
+                "responseModalities": ["AUDIO"]
+            }
+        }
+        try:
+            r = requests.post(url, json=payload, timeout=30)
+            if r.status_code == 200:
+                res_data = r.json()
+                candidates = res_data.get("candidates", [])
+                if candidates:
+                    parts = candidates[0].get("content", {}).get("parts", [])
+                    for p in parts:
+                        inline = p.get("inlineData") or p.get("inline_data")
+                        if inline and "data" in inline:
+                            return {
+                                "audio": inline["data"],
+                                "mime_type": inline.get("mimeType") or inline.get("mime_type") or "audio/mp3",
+                            }
+            else:
+                last_error = f"TTS Model {m} returned {r.status_code}: {r.text}"
+        except Exception as ex:
+            last_error = str(ex)
+
+    raise RuntimeError(f"Gemini TTS failed across all candidate models. Last error: {last_error}")
+
+
+@app.websocket("/ws/voice")
+async def websocket_voice_endpoint(websocket: WebSocket):
+    """
+    WebSocket endpoint for real-time multilingual voice interactions.
+    Architecture:
+    Frontend -> WebSocket -> Gemini STT -> SchemeAgent (LangGraph) -> Gemini TTS -> Frontend
+    """
+    await websocket.accept()
+    try:
+        while True:
+            raw_msg = await websocket.receive_text()
+            try:
+                payload = json.loads(raw_msg)
+            except Exception:
+                await websocket.send_json({"type": "error", "message": "Invalid JSON format."})
+                continue
+
+            action = payload.get("action") or payload.get("type")
+            if action == "ping":
+                await websocket.send_json({"type": "pong"})
+                continue
+
+            audio_b64 = payload.get("audio")
+            mime_type = payload.get("mime_type", "audio/webm")
+            session_id = payload.get("session_id", "default_session")
+            user_data = payload.get("user_data") or {
+                "category": "SC",
+                "gender": "male",
+                "age": 25,
+                "annual_income": 300000.0,
+                "state": "Delhi",
+                "district": "New Delhi",
+                "occupation": "self_employed",
+                "education": "graduate",
+                "purpose": "business",
+                "project_type": "micro_business",
+                "project_cost": 100000.0,
+                "loan_required": 90000.0,
+            }
+            top_3_schemes = payload.get("top_3_schemes")
+            if not top_3_schemes:
+                schemes = fetch_schemes()
+                top_3_schemes, _ = match_schemes(user_data, schemes)
+
+            if not audio_b64:
+                await websocket.send_json({"type": "error", "message": "No audio payload supplied."})
+                continue
+
+            # 1. Gemini Speech-to-Text
+            try:
+                audio_bytes = base64.b64decode(audio_b64)
+                transcription = gemini_stt_sync(audio_bytes, mime_type)
+            except Exception as stt_err:
+                await websocket.send_json({"type": "error", "message": f"Speech-to-Text failed: {str(stt_err)}"})
+                continue
+
+            if not transcription:
+                await websocket.send_json({"type": "error", "message": "Could not recognize speech from audio. Please try again."})
+                continue
+
+            # Send transcription text to client immediately
+            await websocket.send_json({
+                "type": "transcription",
+                "text": transcription
+            })
+
+            # 2. Feed transcription into existing SchemeAgent (LangGraph) pipeline
+            agent = SchemeAgent(
+                user_data=user_data,
+                top_3_schemes=top_3_schemes,
+                session_id=session_id,
+            )
+
+            full_response = ""
+            try:
+                async for chunk in agent.astream(transcription):
+                    if chunk:
+                        full_response += chunk
+                        await websocket.send_json({
+                            "type": "text_chunk",
+                            "content": chunk
+                        })
+            except Exception as agent_err:
+                await websocket.send_json({"type": "error", "message": f"AI Advisor error: {str(agent_err)}"})
+                continue
+
+            await websocket.send_json({
+                "type": "text_done",
+                "full_text": full_response
+            })
+
+            # 3. Gemini Text-to-Speech
+            if full_response.strip():
+                try:
+                    tts_res = gemini_tts_sync(full_response)
+                    await websocket.send_json({
+                        "type": "audio_response",
+                        "audio": tts_res["audio"],
+                        "mime_type": tts_res["mime_type"]
+                    })
+                except Exception as tts_err:
+                    # Voice failure must never break text-based AI advisor
+                    await websocket.send_json({
+                        "type": "tts_error",
+                        "message": f"Text-to-Speech playback unavailable: {str(tts_err)}"
+                    })
+
+            await websocket.send_json({"type": "done"})
+
+    except WebSocketDisconnect:
+        pass
+    except Exception as exc:
+        try:
+            await websocket.send_json({"type": "error", "message": str(exc)})
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":
