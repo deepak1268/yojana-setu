@@ -22,6 +22,7 @@ export interface PartnerLocation {
   lng: number;
   distance_km?: number;
   processing_capacity?: string;
+  phone?: string;
 }
 
 export const DEFAULT_PARTNERS: PartnerLocation[] = [
@@ -245,6 +246,11 @@ export default function PartnerMap({
                 {activePartner.address && (
                   <p className="mt-1 text-xs text-muted leading-tight">
                     {activePartner.address}
+                  </p>
+                )}
+                {activePartner.phone && (
+                  <p className="mt-1 text-xs text-muted leading-tight">
+                    Phone: {activePartner.phone}
                   </p>
                 )}
                 <div className="mt-2 flex items-center justify-between border-t border-navy/10 pt-1.5 text-[11px]">
