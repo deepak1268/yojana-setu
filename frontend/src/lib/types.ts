@@ -43,6 +43,7 @@ export interface Partner {
   name: string;
   type: "SCA" | "PSB" | "RRB" | "NBFC-MFI";
   partner_type?: string;
+  phone?: string;
   state: string;
   city: string;
   latitude: number;
