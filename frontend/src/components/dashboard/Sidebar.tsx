@@ -3,12 +3,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useBookmarks } from "@/context/BookmarkContext";
 
 const links = [
   { href: "/dashboard", label: "Overview", icon: "grid" },
   { href: "/dashboard/recommender", label: "Scheme recommender", icon: "compass" },
   { href: "/dashboard/calculator", label: "EMI calculator", icon: "calc" },
   { href: "/dashboard/locator", label: "Partner locator", icon: "pin" },
+  { href: "/dashboard/bookmarks", label: "Bookmarks", icon: "bookmark" },
 ] as const;
 
 function Icon({ name }: { name: (typeof links)[number]["icon"] }) {
@@ -44,11 +46,23 @@ function Icon({ name }: { name: (typeof links)[number]["icon"] }) {
           <circle cx="12" cy="9.5" r="2.3" stroke="currentColor" strokeWidth="1.6" />
         </svg>
       );
+    case "bookmark":
+      return (
+        <svg {...common}>
+          <path
+            d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5v16.2a.8.8 0 0 1-1.25.66L12 18l-4.75 3.36A.8.8 0 0 1 6 20.7V4.5Z"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
   }
 }
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { bookmarkCount } = useBookmarks();
 
   return (
     <aside className="hidden w-64 shrink-0 flex-col bg-navy text-cream lg:flex">
@@ -75,14 +89,25 @@ export function Sidebar() {
             <Link
               key={link.href}
               href={link.href}
-              className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition ${
+              className={`flex items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition ${
                 active
                   ? "bg-cream text-ink"
                   : "text-cream/70 hover:bg-white/8 hover:text-cream"
               }`}
             >
-              <Icon name={link.icon} />
-              {link.label}
+              <span className="flex items-center gap-3">
+                <Icon name={link.icon} />
+                {link.label}
+              </span>
+              {link.href === "/dashboard/bookmarks" && bookmarkCount > 0 && (
+                <span
+                  className={`rounded-full px-2 py-0.5 text-[11px] font-semibold transition ${
+                    active ? "bg-navy/15 text-navy" : "bg-saffron/25 text-saffron"
+                  }`}
+                >
+                  {bookmarkCount}
+                </span>
+              )}
             </Link>
           );
         })}

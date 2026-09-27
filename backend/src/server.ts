@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db";
 import authRouter from "./routes/authRoutes";
+import bookmarkRouter from "./routes/bookmarkRoutes";
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.get("/", (req, res) => {
     res.send("Backend is working");
 });
 app.use("/api/auth", authRouter);
+app.use("/api/bookmarks", bookmarkRouter);
 
 connectDB().then(() => {
     app.listen(port, () => {

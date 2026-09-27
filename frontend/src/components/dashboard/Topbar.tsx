@@ -33,7 +33,7 @@ export function Topbar({
   }
 
   return (
-    <div className="flex flex-col gap-4 border-b border-navy/10 bg-cream/85 px-5 py-5 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between sm:px-8">
+    <div className="relative z-40 flex flex-col gap-4 border-b border-navy/10 bg-cream/85 px-5 py-5 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between sm:px-8">
       <div>
         <h1 className="font-display text-2xl text-ink sm:text-3xl">{title}</h1>
         {subtitle ? <p className="mt-1 text-sm text-muted">{subtitle}</p> : null}
@@ -52,7 +52,7 @@ export function Topbar({
         </button>
 
         {open && (
-          <div className="absolute right-0 z-10 mt-2 w-52 overflow-hidden rounded-2xl border border-navy/10 bg-card p-1.5 shadow-xl">
+          <div className="absolute right-0 z-50 mt-2 w-52 overflow-hidden rounded-2xl border border-navy/10 bg-card p-1.5 shadow-xl">
             {user && (
               <div className="border-b border-navy/10 px-3 py-2 mb-1">
                 <p className="text-xs font-semibold text-ink truncate">{user.name}</p>

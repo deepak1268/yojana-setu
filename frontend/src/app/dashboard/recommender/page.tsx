@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Topbar } from "@/components/dashboard/Topbar";
+import { useBookmarks } from "@/context/BookmarkContext";
 import { fetchSchemeChat, fetchSchemeMatches } from "@/lib/api";
 import type { SchemeRecommendation, UserProfile } from "@/lib/types";
 
@@ -45,6 +46,7 @@ interface Message {
 }
 
 export default function RecommenderPage() {
+  const { isBookmarked, toggleBookmark } = useBookmarks();
   const [form, setForm] = useState<UserProfile>(initial);
   const [results, setResults] = useState<SchemeRecommendation[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -582,9 +584,35 @@ export default function RecommenderPage() {
                     </p>
                     <h3 className="mt-1 font-display text-xl">{r.scheme_name}</h3>
                   </div>
-                  <span className="shrink-0 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">
-                    {r.match_score}% match
-                  </span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">
+                      {r.match_score}% match
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => toggleBookmark(r)}
+                      title={isBookmarked(r.scheme_id) ? "Remove from bookmarks" : "Save scheme"}
+                      className={`flex h-8 w-8 items-center justify-center rounded-full border transition ${
+                        isBookmarked(r.scheme_id)
+                          ? "border-saffron bg-saffron text-white shadow-sm hover:bg-saffron-deep"
+                          : "border-white/20 bg-white/5 text-cream/70 hover:border-saffron hover:text-saffron hover:bg-white/10"
+                      }`}
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="h-4 w-4"
+                        fill={isBookmarked(r.scheme_id) ? "currentColor" : "none"}
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path
+                          d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
+                          strokeLinejoin="round"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
 
                 <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-white/10 pt-4 text-sm">
@@ -620,12 +648,34 @@ export default function RecommenderPage() {
                   </p>
                 )}
 
-                <a
-                  href="/dashboard/calculator"
-                  className="mt-4 inline-flex text-sm font-semibold text-saffron hover:text-saffron-deep"
-                >
-                  Calculate EMI for this scheme →
-                </a>
+                <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/10 pt-4">
+                  <a
+                    href="/dashboard/calculator"
+                    className="inline-flex text-sm font-semibold text-saffron hover:text-saffron-deep"
+                  >
+                    Calculate EMI for this scheme →
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => toggleBookmark(r)}
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-cream/75 hover:text-cream transition"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      className="h-3.5 w-3.5"
+                      fill={isBookmarked(r.scheme_id) ? "#e36a1a" : "none"}
+                      stroke={isBookmarked(r.scheme_id) ? "#e36a1a" : "currentColor"}
+                      strokeWidth="2"
+                    >
+                      <path
+                        d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
+                        strokeLinejoin="round"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    {isBookmarked(r.scheme_id) ? "Saved" : "Save scheme"}
+                  </button>
+                </div>
               </div>
             ))}
 
