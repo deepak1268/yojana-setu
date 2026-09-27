@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 const links = [
@@ -53,9 +54,14 @@ export function Sidebar() {
     <aside className="hidden w-64 shrink-0 flex-col bg-navy text-cream lg:flex">
       <div className="tricolor-bar h-1 w-full" />
       <Link href="/" className="flex items-center gap-2.5 px-6 py-5">
-        <span className="grid h-9 w-9 place-items-center rounded-xl bg-saffron text-sm font-semibold text-white shadow-sm">
-          YS
-        </span>
+        <Image
+          src="/logo.png"
+          alt="Yojana Setu Logo"
+          width={40}
+          height={36}
+          className="h-9 w-auto rounded-lg object-contain bg-cream/90 p-0.5 shadow-sm"
+          priority
+        />
         <span>
           <span className="block font-display text-lg leading-none">Yojana Setu</span>
           <span className="text-[11px] tracking-wide text-cream/50">योजना सेतु</span>
@@ -81,13 +87,6 @@ export function Sidebar() {
           );
         })}
       </nav>
-
-      <div className="mx-3 mb-5 rounded-2xl border border-white/10 bg-white/5 p-4">
-        <p className="text-xs font-semibold text-saffron">Prototype build</p>
-        <p className="mt-1 text-xs leading-relaxed text-cream/60">
-          Verify eligibility and rates with your channel partner before applying.
-        </p>
-      </div>
     </aside>
   );
 }
