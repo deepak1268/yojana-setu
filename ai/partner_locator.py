@@ -12,6 +12,7 @@ import json
 import math
 import os
 import random
+import sys
 from scheme_matcher import match_schemes, SchemeAgent
 
 # Configurable Risk & Utilization Thresholds
@@ -156,11 +157,11 @@ def save_partners(partners, filename=PARTNERS_FILE):
 
 
 def load_partners(filename=PARTNERS_FILE):
-    """Loads partners from JSON file. Generates dummy dataset if file missing."""
+    """Loads partners from JSON file."""
     if not os.path.exists(filename):
-        partners = generate_dummy_partners()
-        save_partners(partners, filename)
-        return partners
+        print("partners.json not found.")
+        print("Please provide the partner database before running the router.")
+        sys.exit(1)
 
     with open(filename, "r", encoding="utf-8") as f:
         return json.load(f)
@@ -354,9 +355,8 @@ def main():
     # 3. Extract highest-ranked / first recommended scheme_id from AI Matcher output
     selected_scheme_id = recommendations[0]["scheme_id"]
 
-    # Regenerate/load partners to ensure scheme_id compatibility
-    partners = generate_dummy_partners(schemes_path)
-    save_partners(partners, PARTNERS_FILE)
+    # Load existing partner database
+    partners = load_partners(PARTNERS_FILE)
 
     # 4. Ask user ONLY for location (latitude & longitude)
     try:

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useTransition } from "react";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
@@ -150,7 +151,14 @@ export default function login() {
 
           <div className="relative">
             <Link href="/" className="inline-flex items-center gap-3 font-[var(--font-fraunces)] text-2xl font-semibold">
-              <span className="grid h-10 w-10 place-items-center rounded-xl bg-saffron text-lg text-white shadow-lg shadow-saffron/20">YS</span>
+              <Image
+                src="/logo.png"
+                alt="Yojana Setu Logo"
+                width={44}
+                height={40}
+                className="h-10 w-auto rounded-xl bg-cream/90 p-0.5 object-contain shadow-lg shadow-black/10"
+                priority
+              />
               Yojana Setu
             </Link>
             <div className="mt-20 max-w-sm">
@@ -169,7 +177,14 @@ export default function login() {
         <section className="p-6 sm:p-10 lg:p-14">
           <div className="mb-9 flex items-center justify-between lg:hidden">
             <Link href="/" className="inline-flex items-center gap-2 font-[var(--font-fraunces)] text-2xl font-semibold">
-              <span className="grid h-9 w-9 place-items-center rounded-lg bg-saffron text-sm text-white">YS</span>
+              <Image
+                src="/logo.png"
+                alt="Yojana Setu Logo"
+                width={40}
+                height={36}
+                className="h-9 w-auto rounded-lg object-contain"
+                priority
+              />
               Yojana Setu
             </Link>
             <span className="rounded-full bg-green/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-green">Secure access</span>

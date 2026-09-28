@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { BookmarkProvider } from "@/context/BookmarkContext";
 import { Toaster } from "sonner";
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
@@ -31,7 +32,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <AuthProvider>
-          {children}
+          <BookmarkProvider>
+            {children}
+          </BookmarkProvider>
         </AuthProvider>
 
         <Toaster />

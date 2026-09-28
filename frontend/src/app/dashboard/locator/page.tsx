@@ -122,6 +122,7 @@ export default function LocatorPage() {
         lng: p.longitude,
         distance_km: dist,
         processing_capacity: p.processing_capacity,
+        phone: p.phone,
       };
     });
   }, [filteredPartners]);
@@ -328,6 +329,11 @@ export default function LocatorPage() {
                         <p className="text-xs text-muted mt-1">
                           {p.city}, {p.state} · {dist.toFixed(1)} km away · Capacity: {p.processing_capacity}
                         </p>
+                        {p.phone && (
+                          <p className="text-xs text-muted mt-0.5">
+                            Phone: {p.phone}
+                          </p>
+                        )}
                       </div>
                       <div className="flex shrink-0 items-center gap-2">
                         <span className="rounded-full bg-green/10 px-2.5 py-1 text-[11px] font-semibold text-green">

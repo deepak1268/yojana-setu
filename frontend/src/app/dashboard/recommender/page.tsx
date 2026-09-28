@@ -4,8 +4,10 @@ import { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Topbar } from "@/components/dashboard/Topbar";
+import { useBookmarks } from "@/context/BookmarkContext";
 import { fetchSchemeChat, fetchSchemeMatches } from "@/lib/api";
 import type { SchemeRecommendation, UserProfile } from "@/lib/types";
+import jsPDF from "jspdf";
 
 const categories = ["SC", "ST", "OBC", "General"];
 const genders = ["Male", "Female", "Other"];
@@ -45,6 +47,7 @@ interface Message {
 }
 
 export default function RecommenderPage() {
+  const { isBookmarked, toggleBookmark } = useBookmarks();
   const [form, setForm] = useState<UserProfile>(initial);
   const [results, setResults] = useState<SchemeRecommendation[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -322,7 +325,6 @@ export default function RecommenderPage() {
       if (!response.ok || !response.body) {
         throw new Error(`Server returned status ${response.status}`);
       }
-
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
@@ -392,7 +394,382 @@ export default function RecommenderPage() {
       setIsStreaming(false);
     }
   }
+  function downloadSchemePDF(scheme: SchemeRecommendation) {
+    const doc = new jsPDF();
 
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    const margin = 18;
+    const contentWidth = pageWidth - margin * 2;
+
+    let y = 20;
+
+    // ---------- Helpers ----------
+
+    const checkPageBreak = (requiredHeight = 15) => {
+      if (y + requiredHeight > pageHeight - 25) {
+        doc.addPage();
+        y = 20;
+      }
+    };
+
+    const addSectionTitle = (title: string) => {
+      checkPageBreak(18);
+
+      y += 5;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13);
+      doc.setTextColor(25, 45, 70);
+
+      doc.text(title, margin, y);
+
+      y += 3;
+
+      doc.setDrawColor(220, 220, 220);
+      doc.line(margin, y, pageWidth - margin, y);
+
+      y += 9;
+    };
+
+    const addField = (
+      label: string,
+      value: unknown,
+      x: number,
+      width: number
+    ) => {
+      if (value === undefined || value === null || value === "") return;
+
+      const text = String(value);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8.5);
+      doc.setTextColor(110, 110, 110);
+      doc.text(label, x, y);
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10.5);
+      doc.setTextColor(30, 30, 30);
+
+      const lines = doc.splitTextToSize(text, width);
+
+      doc.text(lines, x, y + 5);
+
+      return lines.length;
+    };
+
+    const addBulletList = (items: string[]) => {
+      items.forEach((item) => {
+        checkPageBreak(12);
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(40, 40, 40);
+
+        const lines = doc.splitTextToSize(
+          item,
+          contentWidth - 10
+        );
+
+        doc.text("•", margin, y);
+
+        doc.text(lines, margin + 6, y);
+
+        y += lines.length * 5 + 3;
+      });
+    };
+
+    // ---------- Header ----------
+
+    doc.setFillColor(25, 45, 70);
+    doc.rect(0, 0, pageWidth, 42, "F");
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.text("YOJANA SETU", margin, 13);
+
+    doc.setFontSize(18);
+
+    const schemeTitle = doc.splitTextToSize(
+      scheme.scheme_name || "Government Scheme",
+      contentWidth
+    );
+
+    doc.text(schemeTitle, margin, 24);
+
+    y = 53;
+
+    // ---------- Match Summary ----------
+
+    doc.setFillColor(245, 247, 250);
+    doc.roundedRect(
+      margin,
+      y,
+      contentWidth,
+      25,
+      3,
+      3,
+      "F"
+    );
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+
+    doc.text("RANK", margin + 8, y + 8);
+    doc.text("MATCH SCORE", margin + 70, y + 8);
+    doc.text("ELIGIBILITY", margin + 140, y + 8);
+
+    doc.setFontSize(12);
+    doc.setTextColor(30, 30, 30);
+
+    doc.text(String(scheme.rank), margin + 8, y + 17);
+    doc.text(`${scheme.match_score}%`, margin + 70, y + 17);
+
+    doc.text(
+      scheme.eligibility_status
+        ?.replaceAll("_", " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase()),
+      margin + 140,
+      y + 17
+    );
+
+    y += 36;
+
+    // ---------- Financial Details ----------
+
+    addSectionTitle("Financial Details");
+
+    const financial = scheme.financial_details || {};
+
+    const financialFields = [
+      ["Maximum Loan", financial.max_loan],
+      ["Interest Rate", financial.interest_rate],
+      ["Maximum Tenure", financial.max_tenure],
+      ["Moratorium", financial.moratorium],
+      ["Percentage Financed", financial.percentage_financed],
+    ];
+
+    const columns = 2;
+    const columnWidth = contentWidth / columns;
+
+    let column = 0;
+    let rowStartY = y;
+
+    financialFields.forEach(([label, value]) => {
+      if (value === undefined || value === null || value === "") {
+        return;
+      }
+
+      const x = margin + column * columnWidth;
+
+      addField(
+        String(label),
+        value,
+        x,
+        columnWidth - 12
+      );
+
+      column++;
+
+      if (column === columns) {
+        column = 0;
+        y += 20;
+      }
+    });
+
+    if (column !== 0) {
+      y += 20;
+    }
+
+    // ---------- Documents ----------
+
+    const documents =
+      scheme.documents ||
+      scheme.warnings
+        ?.filter((warning) =>
+          warning.toLowerCase().startsWith("document required:")
+        )
+        .map((warning) =>
+          warning.replace(/^document required:\s*/i, "")
+        );
+
+    if (documents?.length) {
+      addSectionTitle("Documents Required");
+
+      addBulletList(documents);
+    }
+
+    // ---------- Other useful information ----------
+
+    const excludedFields = [
+      "scheme_name",
+      "rank",
+      "match_score",
+      "eligibility_status",
+      "financial_details",
+      "warnings",
+      "matched_rules",
+      "scheme_id",
+      "documents",
+      "source",
+    ];
+
+    const additionalFields = Object.entries(scheme).filter(
+      ([key, value]) =>
+        !excludedFields.includes(key) &&
+        value !== undefined &&
+        value !== null &&
+        value !== ""
+    );
+
+    if (additionalFields.length > 0) {
+      addSectionTitle("Additional Information");
+
+      additionalFields.forEach(([key, value]) => {
+        checkPageBreak(15);
+
+        const label = key
+          .replaceAll("_", " ")
+          .replace(/\b\w/g, (char) => char.toUpperCase());
+
+        const formattedValue =
+          typeof value === "object"
+            ? JSON.stringify(value)
+            : String(value);
+
+        addField(
+          label,
+          formattedValue,
+          margin,
+          contentWidth
+        );
+
+        y += 15;
+      });
+    }
+
+    // ---------- Source ----------
+
+    if (scheme.source?.name || scheme.source?.url) {
+      addSectionTitle("Scheme Information Source");
+
+      if (scheme.source.name) {
+        addField(
+          "Provided By",
+          scheme.source.name,
+          margin,
+          contentWidth
+        );
+
+        y += 15;
+      }
+
+      if (scheme.source.url) {
+        addField(
+          "Official Website",
+          scheme.source.url,
+          margin,
+          contentWidth
+        );
+
+        y += 15;
+      }
+    }
+
+    // ---------- Disclaimer ----------
+
+    // Keep the Important section on the same page
+    const footerSpace = 32;
+
+    if (y > pageHeight - footerSpace - 25) {
+      // Reduce spacing instead of creating another page
+      y = pageHeight - footerSpace - 25;
+    } else {
+      y += 3;
+    }
+
+    doc.setFillColor(248, 248, 248);
+
+    doc.roundedRect(
+      margin,
+      y,
+      contentWidth,
+      23,
+      3,
+      3,
+      "F"
+    );
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(70, 70, 70);
+
+    doc.text(
+      "Important:",
+      margin + 7,
+      y + 8
+    );
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+
+    const disclaimer = doc.splitTextToSize(
+      "Scheme information is provided for guidance only. Please verify the latest eligibility criteria, interest rates, loan limits, required documents and application procedure with the concerned authority or financial institution.",
+      contentWidth - 14
+    );
+
+    doc.text(
+      disclaimer,
+      margin + 7,
+      y + 14
+    );
+
+    // ---------- Footer ----------
+
+    const pageCount = doc.getNumberOfPages();
+
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+
+      doc.setDrawColor(220, 220, 220);
+      doc.line(
+        margin,
+        pageHeight - 15,
+        pageWidth - margin,
+        pageHeight - 15
+      );
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      doc.setTextColor(120, 120, 120);
+
+      doc.text(
+        "Yojana Setu • Scheme Information",
+        margin,
+        pageHeight - 8
+      );
+
+      doc.text(
+        `Page ${i} of ${pageCount}`,
+        pageWidth - margin,
+        pageHeight - 8,
+        { align: "right" }
+      );
+    }
+
+    // ---------- Download ----------
+
+    const filename =
+      `${scheme.scheme_name || "scheme"}`
+        .replace(/[^a-z0-9]+/gi, "-")
+        .replace(/^-|-$/g, "")
+        .toLowerCase();
+
+    doc.save(`${filename}.pdf`);
+  }
   return (
     <>
       <Topbar title="Scheme recommender" subtitle="Fill in your details to see eligible schemes." />
@@ -582,9 +959,35 @@ export default function RecommenderPage() {
                     </p>
                     <h3 className="mt-1 font-display text-xl">{r.scheme_name}</h3>
                   </div>
-                  <span className="shrink-0 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">
-                    {r.match_score}% match
-                  </span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">
+                      {r.match_score}% match
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => toggleBookmark(r)}
+                      title={isBookmarked(r.scheme_id) ? "Remove from bookmarks" : "Save scheme"}
+                      className={`flex h-8 w-8 items-center justify-center rounded-full border transition ${
+                        isBookmarked(r.scheme_id)
+                          ? "border-saffron bg-saffron text-white shadow-sm hover:bg-saffron-deep"
+                          : "border-white/20 bg-white/5 text-cream/70 hover:border-saffron hover:text-saffron hover:bg-white/10"
+                      }`}
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="h-4 w-4"
+                        fill={isBookmarked(r.scheme_id) ? "currentColor" : "none"}
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path
+                          d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
+                          strokeLinejoin="round"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
 
                 <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-white/10 pt-4 text-sm">
@@ -620,12 +1023,60 @@ export default function RecommenderPage() {
                   </p>
                 )}
 
-                <a
-                  href="/dashboard/calculator"
-                  className="mt-4 inline-flex text-sm font-semibold text-saffron hover:text-saffron-deep"
-                >
-                  Calculate EMI for this scheme →
-                </a>
+                <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/10 pt-4">
+                  <a
+                    href="/dashboard/calculator"
+                    className="inline-flex text-sm font-semibold text-saffron hover:text-saffron-deep"
+                  >
+                    Calculate EMI for this scheme →
+                  </a>
+
+                  <div className="flex items-center gap-2">
+                    {/* Bookmark button */}
+                    <button
+                      type="button"
+                      onClick={() => toggleBookmark(r)}
+                      className="inline-flex items-center gap-1.5 text-xs font-medium text-cream/75 hover:text-cream transition"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="h-3.5 w-3.5"
+                        fill={isBookmarked(r.scheme_id) ? "#e36a1a" : "none"}
+                        stroke={isBookmarked(r.scheme_id) ? "#e36a1a" : "currentColor"}
+                        strokeWidth="2"
+                      >
+                        <path
+                          d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
+                          strokeLinejoin="round"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      {isBookmarked(r.scheme_id) ? "Saved" : "Save scheme"}
+                    </button>
+
+                    {/* Download PDF button */}
+                    <button
+                      type="button"
+                      onClick={() => downloadSchemePDF(r)}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-white/10 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-white/20"
+                    >
+                      <svg
+                        className="h-3.5 w-3.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"
+                        />
+                      </svg>
+                      Download PDF
+                    </button>
+                  </div>
+                </div>
               </div>
             ))}
 
@@ -677,8 +1128,8 @@ export default function RecommenderPage() {
                   >
                     <div
                       className={`max-w-[90%] rounded-2xl px-4 py-3 text-sm ${msg.role === "user"
-                          ? "bg-saffron text-white"
-                          : "bg-navy/5 text-ink border border-navy/10"
+                        ? "bg-saffron text-white"
+                        : "bg-navy/5 text-ink border border-navy/10"
                         }`}
                     >
                       {msg.role === "user" ? (
@@ -721,8 +1172,8 @@ export default function RecommenderPage() {
                     isRecording
                       ? "🔴 Recording..."
                       : isVoiceProcessing
-                      ? "Processing voice..."
-                      : "Ask a question about your scheme match..."
+                        ? "Processing voice..."
+                        : "Ask a question about your scheme match..."
                   }
                   disabled={isStreaming || isRecording || isVoiceProcessing}
                   className="flex-1 rounded-xl border border-navy/15 bg-background px-4 py-2 text-sm outline-none focus:border-saffron focus:ring-2 focus:ring-saffron/10 disabled:opacity-50"
@@ -733,13 +1184,12 @@ export default function RecommenderPage() {
                   onClick={isRecording ? stopRecording : startRecording}
                   disabled={isStreaming || isVoiceProcessing}
                   title={isRecording ? "Stop recording" : "Voice input"}
-                  className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold transition disabled:opacity-50 ${
-                    isRecording
-                      ? "bg-red-600 text-white animate-pulse"
-                      : isVoiceProcessing
+                  className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold transition disabled:opacity-50 ${isRecording
+                    ? "bg-red-600 text-white animate-pulse"
+                    : isVoiceProcessing
                       ? "bg-saffron/20 text-saffron-deep"
                       : "bg-navy/10 text-navy hover:bg-navy/20"
-                  }`}
+                    }`}
                 >
                   {isRecording ? (
                     <>

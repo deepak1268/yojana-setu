@@ -603,10 +603,7 @@ def gemini_tts_sync(text: str) -> Dict[str, str]:
     tts_prompt = f"Read out the following text transcript aloud in a clear, natural human voice in its native language:\n\n{text}"
 
     tts_models = [
-        "gemini-2.5-flash-preview-tts",
-        "gemini-3.8-flash-tts",
-        "gemini-3.1-flash-tts-preview",
-        "gemini-3.8-flash-lite-tts",
+        "gemini-3.8-flash-tts"
     ]
 
     last_error = None
@@ -625,7 +622,7 @@ def gemini_tts_sync(text: str) -> Dict[str, str]:
             }
         }
         try:
-            r = requests.post(url, json=payload, timeout=30)
+            r = requests.post(url, json=payload, timeout=60)
             if r.status_code == 200:
                 res_data = r.json()
                 candidates = res_data.get("candidates", [])

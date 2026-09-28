@@ -20,7 +20,7 @@ export function Features() {
   return (
     <section
       id="features"
-      className="scroll-mt-16 mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:py-20"
+      className="scroll-mt-[25vh] mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:py-20"
     >
       <div className="max-w-2xl">
         <h2 className="font-display text-3xl text-ink sm:text-4xl">

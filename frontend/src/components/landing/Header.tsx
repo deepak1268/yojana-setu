@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 
 export function Header() {
@@ -13,22 +14,14 @@ export function Header() {
       <div className="tricolor-bar h-1 w-full" />
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3.5 sm:px-6">
         <a href="#top" className="flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-navy text-cream shadow-sm">
-            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden>
-              <path
-                d="M4 18V8.5L12 4l8 4.5V18"
-                stroke="currentColor"
-                strokeWidth="1.7"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M8 18v-5.5h8V18"
-                stroke="#E36A1A"
-                strokeWidth="1.7"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
+          <Image
+            src="/logo.png"
+            alt="Yojana Setu Logo"
+            width={44}
+            height={36}
+            className="h-9 w-auto rounded-lg object-contain"
+            priority
+          />
           <span>
             <span className="block font-display text-lg leading-none font-semibold text-ink">
               Yojana Setu
